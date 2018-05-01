@@ -1,3 +1,4 @@
 /RBGNature/obj/*
 /RBGNature/bin/*
 /.vs/*
+*.csproj.user
