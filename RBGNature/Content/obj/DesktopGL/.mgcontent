@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Profile>Reach</Profile>
+  <Platform>DesktopGL</Platform>
+  <Config />
+  <SourceFiles>
+    <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/map.png</File>
+    <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/man.png</File>
+    <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Maps/test1/2.png</File>
+    <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Maps/test1/0.png</File>
+    <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Sprites/man/man.png</File>
+    <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Sprites/mc/front.png</File>
+    <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Maps/test1/1.png</File>
+  </SourceFiles>
+</SourceFileCollection>
