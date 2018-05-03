@@ -97,3 +97,15 @@
 /processorParam:TextureFormat=Color
 /build:Maps/test1/1.png
 
+#begin Maps/test2/waterworld.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Maps/test2/waterworld.png
+

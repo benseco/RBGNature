@@ -47,18 +47,6 @@ namespace RBGNature.Actor
             if (kstate.IsKeyDown(Keys.Right))
                 direction.X += distance;
 
-            if (Tri.PIT(camera.Position.X, camera.Position.Y, 100, 100, 100, 600, 600, 100) && direction.Y == 0)
-            {
-                if (direction.X > 0)
-                {
-                    direction.Y += distance;
-                }
-                else if (direction.X < 0)
-                {
-                    direction.Y -= distance;
-                }
-            }
-
             camera.Move(direction);
         }
 

@@ -15,13 +15,15 @@ namespace RBGNature.Actor.Map
         Texture2D textureMap1;
         Texture2D textureMap2;
 
+        Texture2D textureWaterworld;
+
         public override void LoadContent(ContentManager contentManager)
         {
             textureMap0 = contentManager.Load<Texture2D>("Maps/test1/0");
             textureMap1 = contentManager.Load<Texture2D>("Maps/test1/1");
             textureMap2 = contentManager.Load<Texture2D>("Maps/test1/2");
 
-
+            textureWaterworld = contentManager.Load<Texture2D>("Maps/test2/waterworld");
         }
 
         public override void Update(GameTime gameTime)
@@ -30,9 +32,11 @@ namespace RBGNature.Actor.Map
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(textureMap0, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
-            spriteBatch.Draw(textureMap1, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .9f);
-            spriteBatch.Draw(textureMap2, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
+            spriteBatch.Draw(textureWaterworld, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+
+            //spriteBatch.Draw(textureMap0, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            //spriteBatch.Draw(textureMap1, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .9f);
+            //spriteBatch.Draw(textureMap2, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
         }
     }
 }
