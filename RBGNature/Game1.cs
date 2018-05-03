@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using RBGNature.Physics;
+using RBGNature.Scene;
 
 namespace RBGNature
 {
@@ -13,14 +14,8 @@ namespace RBGNature
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         RenderTarget2D renderTarget;
-
-        Texture2D textureMan;
-        Texture2D textureMap0;
-        Texture2D textureMap1;
-        Texture2D textureMap2;
-
-        Camera camera;
-
+        BaseScene scene;
+        
         int[,,] collision = {
             {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}},
             {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}},
@@ -62,16 +57,8 @@ namespace RBGNature
             renderTarget = new RenderTarget2D(graphics.GraphicsDevice, 640, 360, false, SurfaceFormat.Color,
                 DepthFormat.None, presentationParameters.MultiSampleCount, RenderTargetUsage.DiscardContents);
 
-            // set up camera
-            camera = new Camera
-            {
-                //Zoom = 2,
-                Origin = new Vector2(320, 180)
-            };
 
-            //load json
-            //string json = @"{'3':{'0':{'3':{'collide':true}},'1':{'0':{'collide':false},'2':{'collide':false},'3':{'collide':true}},'2':{'3':{'collide':true}},'3':{'3':{'collide':true}},'4':{'3':{'collide':true}},'5':{'3':{'collide':true}},'6':{'3':{'collide':true}}},'4':{'1':{'1':{'collide':false},'2':{'collide':false},'3':{'collide':false}},'7':{'1':{'collide':true},'2':{'collide':true}},'9':{'2':{'collide':true}}},'5':{'1':{'1':{'collide':false},'2':{'collide':false},'3':{'collide':false}}},'6':{'1':{'2':{'collide':false}},'7':{'2':{'collide':true},'3':{'collide':true}},'9':{'2':{'collide':true}}},'7':{'0':{'1':{'collide':true}},'1':{'1':{'collide':true}},'2':{'1':{'collide':true}},'3':{'1':{'collide':true}},'4':{'1':{'collide':true}},'5':{'1':{'collide':true}},'6':{'1':{'collide':true}}}}";
-             
+            scene = new TestScene();
 
             base.Initialize();
         }
@@ -86,10 +73,7 @@ namespace RBGNature
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            textureMan = Content.Load<Texture2D>("Sprites/mc/front");
-            textureMap0 = Content.Load<Texture2D>("Maps/test1/0");
-            textureMap1 = Content.Load<Texture2D>("Maps/test1/1");
-            textureMap2 = Content.Load<Texture2D>("Maps/test1/2");
+            scene.LoadContent(Content);
         }
 
         /// <summary>
@@ -99,6 +83,7 @@ namespace RBGNature
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            Content.Unload();
         }
 
         /// <summary>
@@ -112,46 +97,11 @@ namespace RBGNature
                 Exit();
 
             // TODO: Add your update logic here
-
-            Vector2 direction = Vector2.Zero;
-            float speed = .25f;
-            float elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
-            float distance = speed * elapsedTime;
-
-            var kstate = Keyboard.GetState();
-
-            if (kstate.IsKeyDown(Keys.Up))
-                direction.Y -= distance;
-
-            if (kstate.IsKeyDown(Keys.Down))
-                direction.Y += distance;
-
-            if (kstate.IsKeyDown(Keys.Left))
-                direction.X -= distance;
-
-            if (kstate.IsKeyDown(Keys.Right))
-                direction.X += distance;
-
-            if (Tri.PIT(camera.Position.X, camera.Position.Y, 100, 100, 100, 600, 600, 100) && direction.Y == 0)
-            {
-                if (direction.X > 0)
-                {
-                    direction.Y += distance;
-                }
-                else if (direction.X < 0)
-                {
-                    direction.Y -= distance;
-                }
-            }
-
-            camera.Move(direction);
-
-            if (framecount++ % 120 == 0)System.Console.WriteLine("Camera position: " + camera.Position.X + ", " + camera.Position.Y);
-
+            scene.Update(gameTime);
 
             base.Update(gameTime);
         }
-        private int framecount = 0;
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -172,11 +122,8 @@ namespace RBGNature
             //spriteBatch.Draw(textureMan, camera.Position, Color.White);
             //spriteBatch.End();
 
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: camera.GetTransform());
-            spriteBatch.Draw(textureMap0, new Vector2(0, 0), Color.White);
-            spriteBatch.Draw(textureMan, camera.Position, Color.White);
-            spriteBatch.Draw(textureMap1, new Vector2(0, 0), Color.White);
-            spriteBatch.Draw(textureMap2, new Vector2(0, 0), Color.White);
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: scene.Camera.GetTransform(), sortMode: SpriteSortMode.FrontToBack);
+            scene.Draw(spriteBatch);
             spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(null);
