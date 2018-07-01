@@ -60,6 +60,9 @@ namespace RBGNature
 
             scene = new TestScene();
 
+
+            this.IsMouseVisible = true;
+
             base.Initialize();
         }
 

@@ -33,5 +33,10 @@ namespace RBGNature
             return translationMatrix * scaleMatrix * originMatrix;
         }
 
+        //screen center, hardcode to 4x right now as the screen resolution is hardcoded to 2560x1440
+        public Vector2 FocalPoint
+        {
+            get { return Origin * 4; }
+        }
     }
 }
