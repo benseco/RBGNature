@@ -54,16 +54,16 @@ namespace RBGNature.Actor
 
             var kstate = Keyboard.GetState();
 
-            if (kstate.IsKeyDown(Keys.Up))
+            if (kstate.IsKeyDown(Keys.W))
                 direction.Y -= distance;
 
-            if (kstate.IsKeyDown(Keys.Down))
+            if (kstate.IsKeyDown(Keys.S))
                 direction.Y += distance;
 
-            if (kstate.IsKeyDown(Keys.Left))
+            if (kstate.IsKeyDown(Keys.A))
                 direction.X -= distance;
 
-            if (kstate.IsKeyDown(Keys.Right))
+            if (kstate.IsKeyDown(Keys.D))
                 direction.X += distance;
 
             camera.Move(direction);
