@@ -13,8 +13,8 @@ window.onload = function() {
         var ypos = event.clientY - rect.top;
         console.log("x" + xpos + " y" + ypos);
 
-        var i=toGrid(xpos);
-        var j=toGrid(ypos);
+        var i=toGrid(ypos);
+        var j=toGrid(xpos);
         var k=whichTri(toLocal(xpos), toLocal(ypos));
         data[i][j][k]=(data[i][j][k]+1)%5;
         redraw();
@@ -111,8 +111,8 @@ function redraw(){
 }
 
 function drawTri(i,j,k,color){
-    var xtri = toWorld(i);
-    var ytri = toWorld(j);
+    var ytri = toWorld(i);
+    var xtri = toWorld(j);
     
     ctx.beginPath();
     switch(k){
