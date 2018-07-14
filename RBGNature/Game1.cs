@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using RBGNature.Actor.Scene;
 using RBGNature.Physics;
-using RBGNature.Scene;
 
 namespace RBGNature
 {
@@ -58,7 +58,7 @@ namespace RBGNature
                 DepthFormat.None, presentationParameters.MultiSampleCount, RenderTargetUsage.DiscardContents);
 
 
-            scene = new TestScene();
+            scene = new DemoScene();
 
 
             this.IsMouseVisible = true;

@@ -14,6 +14,7 @@
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>DesktopGL</MonoGamePlatform>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -43,18 +44,27 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Actor\BaseActor.cs" />
+    <Compile Include="Actor\Map\DemoMap.cs" />
     <Compile Include="Actor\Map\TestMap.cs" />
+    <Compile Include="Actor\ParentActor.cs" />
+    <Compile Include="Actor\Scene\BaseScene.cs" />
+    <Compile Include="Actor\Scene\DemoScene.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Actor\Player.cs" />
+    <Compile Include="Physics\Circle.cs" />
+    <Compile Include="Physics\CollisionResult.cs" />
+    <Compile Include="Physics\ICollide.cs" />
+    <Compile Include="Physics\PhysicsGroup.cs" />
+    <Compile Include="Physics\PhysicsObject.cs" />
     <Compile Include="Physics\Tri.cs" />
+    <Compile Include="Physics\TriArray.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scene\BaseScene.cs" />
     <Compile Include="Actor\Map\BaseMap.cs" />
-    <Compile Include="Scene\TestScene.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
@@ -111,6 +121,7 @@
       <Link>MonoGame.Framework.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="app.config" />
     <None Include="app.manifest" />
     <None Include="packages.config" />
   </ItemGroup>

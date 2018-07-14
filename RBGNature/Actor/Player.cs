@@ -11,15 +11,19 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Actor
 {
-    class Player : BaseActor
+    class Player : BaseActor, ICollide
     {
+        static readonly Rectangle RectBulletDefault = new Rectangle(0, 0, 6, 6);
+        static readonly Rectangle RectBulletCannon = new Rectangle(6, 0, 9, 9);
+
         Camera camera;
         Texture2D textureMan;
         Texture2D textureBullet;
         List<Tuple<Vector2,Vector2>> bullets;
+        Circle collision;
+        Vector2 stepDirection;
 
-        static readonly Rectangle RectBulletDefault = new Rectangle(0, 0, 6, 6);
-        static readonly Rectangle RectBulletCannon = new Rectangle(6, 0, 9, 9);
+        Texture2D textureCollisionRect;
 
         GunMode mode;
         private bool canChangeMode;
@@ -37,36 +41,42 @@ namespace RBGNature.Actor
         {
             this.camera = camera;
             this.bullets = new List<Tuple<Vector2, Vector2>>();
+            collision = new Circle()
+            {
+                Radius = 10,
+                Center = new Vector2(camera.Position.X, camera.Position.Y)
+            };
         }
 
         public override void LoadContent(ContentManager contentManager)
         {
             textureMan = contentManager.Load<Texture2D>("Sprites/mc/front");
             textureBullet = contentManager.Load<Texture2D>("Sprites/bullet/bullet");
+            textureCollisionRect = contentManager.Load<Texture2D>("Sprites/debug/collisionrect");
         }
 
         public override void Update(GameTime gameTime)
         {
-            Vector2 direction = Vector2.Zero;
-            float speed = .25f;
+            stepDirection = Vector2.Zero;
+            float speed = .05f;
             float elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
             float distance = speed * elapsedTime;
 
             var kstate = Keyboard.GetState();
 
             if (kstate.IsKeyDown(Keys.W))
-                direction.Y -= distance;
+                stepDirection.Y -= distance;
 
             if (kstate.IsKeyDown(Keys.S))
-                direction.Y += distance;
+                stepDirection.Y += distance;
 
             if (kstate.IsKeyDown(Keys.A))
-                direction.X -= distance;
+                stepDirection.X -= distance;
 
             if (kstate.IsKeyDown(Keys.D))
-                direction.X += distance;
+                stepDirection.X += distance;
 
-            camera.Move(direction);
+            camera.Move(stepDirection);
 
 
             if (kstate.IsKeyDown(Keys.F))
@@ -96,7 +106,8 @@ namespace RBGNature.Actor
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(textureMan, camera.Position, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
+            spriteBatch.Draw(textureMan, camera.Position - new Vector2(10,30), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
+            spriteBatch.Draw(textureCollisionRect, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
             if (mode == GunMode.Default)
             {
@@ -114,6 +125,21 @@ namespace RBGNature.Actor
 
             }
 
+        }
+        
+        public PhysicsObject GetCollisionObject(PhysicsGroupType groupType)
+        {
+            if (groupType == PhysicsGroupType.Physical)
+            {
+                collision.Center = new Vector2(camera.Position.X, camera.Position.Y);
+                return collision;
+            }
+            return null;
+        }
+
+        public void OnCollide(PhysicsGroupType groupType, CollisionResult collisionResult)
+        {
+            camera.Move(Vector2.Negate(stepDirection));
         }
     }
 }

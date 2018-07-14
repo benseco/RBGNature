@@ -13,5 +13,7 @@
     <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Maps/test1/1.png</File>
     <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Maps/test2/waterworld.png</File>
     <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Sprites/bullet/bullet.png</File>
+    <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Maps/Demo/0.png</File>
+    <File>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Sprites/debug/collisionrect.png</File>
   </SourceFiles>
 </SourceFileCollection>

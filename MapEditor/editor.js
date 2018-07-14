@@ -59,7 +59,7 @@ function printData(){
     var result = "{";
     for (var i=0; i<data.length; i++){
         result += i==0?"\n{":",\n{";
-        for (var j=0; j<data.length; j++){
+        for (var j=0; j<data[0].length; j++){
             result += j==0?"{":",{";
             result += data[i][j].toString();
             result += "}";

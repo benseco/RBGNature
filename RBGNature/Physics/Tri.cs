@@ -24,5 +24,6 @@ namespace RBGNature.Physics
 
             return s > 0 && t > 0 && (s + t) < 2 * A * sign;
         }
+
     }
 }

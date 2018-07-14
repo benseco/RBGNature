@@ -9,18 +9,10 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Actor
 {
-    class BaseActor
+    abstract class BaseActor
     {
-        public virtual void LoadContent(ContentManager contentManager)
-        {
-        }
-
-        public virtual void Update(GameTime gameTime)
-        {
-        }
-
-        public virtual void Draw(SpriteBatch spriteBatch)
-        {
-        }
+        public abstract void LoadContent(ContentManager contentManager);
+        public abstract void Update(GameTime gameTime);
+        public abstract void Draw(SpriteBatch spriteBatch);
     }
 }
