@@ -6,9 +6,26 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Physics
 {
-    class TriArray : PhysicsObject
+    public class TriArray : PhysicsObject
     {
         private int[,,] array;
+
+        public static Triangle GetTriangle(int i, int j, int k)
+        {
+            // Multiply by tile width to get top left bound
+            const int w = 20;
+            i *= w;
+            j *= w;
+
+            switch (k)
+            {
+                case 0: return new Triangle(j, i, j + w, i, j + w / 2, i + w / 2); //TOP
+                case 1: return new Triangle(j, i, j, i + w, j + w / 2, i + w / 2); //LEFT
+                case 2: return new Triangle(j, i + w, j + w, i + w, j + w / 2, i + w / 2); //BOTTOM
+                case 3: return new Triangle(j + w, i, j + w, i + w, j + w / 2, i + w / 2); //RIGHT
+                default: throw new InvalidOperationException(string.Format("Triangle.GetTriangle was called with k={0}. K must be in [0,3].",k));
+            }
+        }
 
         public TriArray(int[,,] array)
         {
@@ -17,12 +34,6 @@ namespace RBGNature.Physics
 
         public override CollisionResult Collide(Circle c)
         {
-            // a . a
-            //------- * b
-            // b . b
-
-
-
             int xIndex = (int)(c.Center.X / 20);
             int yIndex = (int)(c.Center.Y / 20);
             int xMin = (int)((c.Center.X - c.Radius) / 20);
@@ -34,20 +45,20 @@ namespace RBGNature.Physics
             Console.Write(" | XBounds: " + xMin + " - " + xMax);
             Console.WriteLine(" | YBounds: " + yMin + " - " + yMax);
 
-            for (int i = yMin; i <= yMax; i++)
+            for (int i = yMin; i <= yMax; i++) //row
             {
                 if (i < 0 || i >= array.GetLength(0)) continue; // Index is out of bounds
 
-                for (int j = xMin; j <= xMax; j++)
+                for (int j = xMin; j <= xMax; j++) //column
                 {
                     if (j < 0 || j >= array.GetLength(1)) continue; // Index is out of bounds
+                    
+                    for (int k = 0; k < 4; k++) //subtriangle
+                    {
+                        if (array[i, j, k] != 1) continue; //triangle does not collide
 
-                    if (array[i, j, 0] == 1 ||
-                        array[i, j, 1] == 1 ||
-                        array[i, j, 2] == 1 ||
-                        array[i, j, 3] == 1)
-                        return new CollisionResult(true);
-
+                        if (GetTriangle(i, j, k).Intersects(c)) return new CollisionResult(true);
+                    }
                 }
             }
 

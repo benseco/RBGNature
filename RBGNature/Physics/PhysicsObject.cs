@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Physics
 {
-    abstract class PhysicsObject
+    public abstract class PhysicsObject
     {
         public abstract CollisionResult Collide(Circle c);
         public abstract CollisionResult Collide(TriArray triArray);

@@ -57,7 +57,7 @@
     <Compile Include="Physics\ICollide.cs" />
     <Compile Include="Physics\PhysicsGroup.cs" />
     <Compile Include="Physics\PhysicsObject.cs" />
-    <Compile Include="Physics\Tri.cs" />
+    <Compile Include="Physics\Triangle.cs" />
     <Compile Include="Physics\TriArray.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

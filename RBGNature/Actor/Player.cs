@@ -23,7 +23,7 @@ namespace RBGNature.Actor
         Circle collision;
         Vector2 stepDirection;
 
-        Texture2D textureCollisionRect;
+        Texture2D textureCircle10;
 
         GunMode mode;
         private bool canChangeMode;
@@ -52,13 +52,13 @@ namespace RBGNature.Actor
         {
             textureMan = contentManager.Load<Texture2D>("Sprites/mc/front");
             textureBullet = contentManager.Load<Texture2D>("Sprites/bullet/bullet");
-            textureCollisionRect = contentManager.Load<Texture2D>("Sprites/debug/collisionrect");
+            textureCircle10 = contentManager.Load<Texture2D>("Sprites/debug/circle10");
         }
 
         public override void Update(GameTime gameTime)
         {
             stepDirection = Vector2.Zero;
-            float speed = .05f;
+            float speed = .08f;
             float elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
             float distance = speed * elapsedTime;
 
@@ -107,7 +107,7 @@ namespace RBGNature.Actor
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(textureMan, camera.Position - new Vector2(10,30), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
-            spriteBatch.Draw(textureCollisionRect, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
             if (mode == GunMode.Default)
             {

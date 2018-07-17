@@ -90,7 +90,7 @@ namespace RBGNature.Actor.Map
         Texture2D textureMap0;
         TriArray collision;
 
-        Texture2D textureCollisionRect;
+        Texture2D[] textureTri;
 
         public DemoMap()
         {
@@ -100,7 +100,12 @@ namespace RBGNature.Actor.Map
         public override void LoadContent(ContentManager contentManager)
         {
             textureMap0 = contentManager.Load<Texture2D>("Maps/demo/0");
-            textureCollisionRect = contentManager.Load<Texture2D>("Sprites/debug/collisionrect");
+
+            textureTri = new Texture2D[4];
+            textureTri[0] = contentManager.Load<Texture2D>("Sprites/debug/tritop");
+            textureTri[1] = contentManager.Load<Texture2D>("Sprites/debug/trileft");
+            textureTri[2] = contentManager.Load<Texture2D>("Sprites/debug/tribottom");
+            textureTri[3] = contentManager.Load<Texture2D>("Sprites/debug/triright");
         }
 
         public override void Update(GameTime gameTime)
@@ -115,12 +120,11 @@ namespace RBGNature.Actor.Map
             {
                 for (int j = 0; j < collisionData.GetLength(1); j++)
                 {
-                    if (collisionData[i, j, 0] == 1 ||
-                        collisionData[i, j, 1] == 1 ||
-                        collisionData[i, j, 2] == 1 ||
-                        collisionData[i, j, 3] == 1)
-
-                        spriteBatch.Draw(textureCollisionRect, new Vector2(j* 20, i * 20), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+                    for (int k = 0; k < 4; k++)
+                    {
+                        if (collisionData[i, j, k] == 1)
+                            spriteBatch.Draw(textureTri[k], new Vector2(j * 20, i * 20), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+                    }                        
                 }
             }
         }

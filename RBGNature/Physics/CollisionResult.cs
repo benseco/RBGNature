@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Physics
 {
-    struct CollisionResult
+    public struct CollisionResult
     {
         public bool IsCollision;
 
