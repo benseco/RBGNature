@@ -25,7 +25,7 @@ namespace RBGNature.Actor.Scene
             {
                 //Zoom = 2,
                 Origin = new Vector2(320, 180),
-                Position = new Vector2(200, 400)
+                Position = new Vector2(0, 0)
             };
 
             map = new DemoMap();

@@ -21,9 +21,9 @@ namespace RBGNature.Actor
         Texture2D textureBullet;
         List<Tuple<Vector2,Vector2>> bullets;
         Circle collision;
-        Vector2 stepDirection;
 
         Texture2D textureCircle10;
+        Texture2D textureCircle200;
 
         GunMode mode;
         private bool canChangeMode;
@@ -44,7 +44,8 @@ namespace RBGNature.Actor
             collision = new Circle()
             {
                 Radius = 10,
-                Center = new Vector2(camera.Position.X, camera.Position.Y)
+                Position = new Vector2(camera.Position.X, camera.Position.Y),
+                Mass = 1
             };
         }
 
@@ -53,30 +54,32 @@ namespace RBGNature.Actor
             textureMan = contentManager.Load<Texture2D>("Sprites/mc/front");
             textureBullet = contentManager.Load<Texture2D>("Sprites/bullet/bullet");
             textureCircle10 = contentManager.Load<Texture2D>("Sprites/debug/circle10");
+            textureCircle200 = contentManager.Load<Texture2D>("Sprites/debug/circle200");
         }
 
         public override void Update(GameTime gameTime)
         {
-            stepDirection = Vector2.Zero;
-            float speed = .08f;
+            collision.Position = camera.Position;
+            collision.Velocity = Vector2.Zero;
+            float speed = 3f;
             float elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
             float distance = speed * elapsedTime;
 
             var kstate = Keyboard.GetState();
 
             if (kstate.IsKeyDown(Keys.W))
-                stepDirection.Y -= distance;
+                collision.Velocity.Y -= distance;
 
             if (kstate.IsKeyDown(Keys.S))
-                stepDirection.Y += distance;
+                collision.Velocity.Y += distance;
 
             if (kstate.IsKeyDown(Keys.A))
-                stepDirection.X -= distance;
+                collision.Velocity.X -= distance;
 
             if (kstate.IsKeyDown(Keys.D))
-                stepDirection.X += distance;
+                collision.Velocity.X += distance;
 
-            camera.Move(stepDirection);
+            camera.Move(collision.Velocity);
 
 
             if (kstate.IsKeyDown(Keys.F))
@@ -108,6 +111,7 @@ namespace RBGNature.Actor
         {
             spriteBatch.Draw(textureMan, camera.Position - new Vector2(10,30), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
             spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
             if (mode == GunMode.Default)
             {
@@ -131,15 +135,14 @@ namespace RBGNature.Actor
         {
             if (groupType == PhysicsGroupType.Physical)
             {
-                collision.Center = new Vector2(camera.Position.X, camera.Position.Y);
                 return collision;
             }
             return null;
         }
-
+        
         public void OnCollide(PhysicsGroupType groupType, CollisionResult collisionResult)
         {
-            camera.Move(Vector2.Negate(stepDirection));
+            camera.Position = collisionResult.PositionA;
         }
     }
 }

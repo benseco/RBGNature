@@ -37,14 +37,37 @@ namespace RBGNature.Physics
         }
 
 
-        public bool Intersects(Circle c)
-        {
-            if (Intersects(c.Center)) return true;
-            if (c.Intersects(A, B)) return true;
-            if (c.Intersects(B, C)) return true;
-            if (c.Intersects(A, C)) return true;
-            return false;
-        }
+        //public bool Intersects(Circle c)
+        //{
+
+        //    CollisionResult ab = c.Intersects(A, B);
+        //    CollisionResult bc = c.Intersects(B, C);
+        //    CollisionResult ac = c.Intersects(A, C);
+
+        //    float ablen = ab.Impulse.LengthSquared();
+        //    float bclen = bc.Impulse.LengthSquared();
+        //    float aclen = ac.Impulse.LengthSquared();
+
+        //    if (ablen >= bclen && ablen >= aclen) return 
+
+
+        //    if (ab.Impulse.LengthSquared() > bc.Impulse.LengthSquared())
+        //    {
+        //        if (ab.Impulse.LengthSquared)
+        //    }
+
+        //    if (c.Intersects(B, C)) return true;
+        //    if (c.Intersects(A, C)) return true;
+
+
+        //    CollisionResult inside = Intersects(c.Position);
+
+
+
+
+        //    if (Intersects(c.Position)) return true;
+        //    return false;
+        //}
 
     }
 }

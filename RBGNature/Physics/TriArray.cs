@@ -34,12 +34,12 @@ namespace RBGNature.Physics
 
         public override CollisionResult Collide(Circle c)
         {
-            int xIndex = (int)(c.Center.X / 20);
-            int yIndex = (int)(c.Center.Y / 20);
-            int xMin = (int)((c.Center.X - c.Radius) / 20);
-            int xMax = (int)((c.Center.X + c.Radius) / 20);
-            int yMin = (int)((c.Center.Y - c.Radius) / 20);
-            int yMax = (int)((c.Center.Y + c.Radius) / 20);
+            int xIndex = (int)(c.Position.X / 20);
+            int yIndex = (int)(c.Position.Y / 20);
+            int xMin = (int)((c.Position.X - c.Radius) / 20);
+            int xMax = (int)((c.Position.X + c.Radius) / 20);
+            int yMin = (int)((c.Position.Y - c.Radius) / 20);
+            int yMax = (int)((c.Position.Y + c.Radius) / 20);
 
             Console.Write("Index: " + xIndex + ", " + yIndex);
             Console.Write(" | XBounds: " + xMin + " - " + xMax);
@@ -57,12 +57,12 @@ namespace RBGNature.Physics
                     {
                         if (array[i, j, k] != 1) continue; //triangle does not collide
 
-                        if (GetTriangle(i, j, k).Intersects(c)) return new CollisionResult(true);
+                        //if (GetTriangle(i, j, k).Intersects(c)) return CollisionResult.None;
                     }
                 }
             }
 
-            return new CollisionResult(false);
+            return CollisionResult.None;
         }
 
         public override CollisionResult Collide(TriArray triArray)
