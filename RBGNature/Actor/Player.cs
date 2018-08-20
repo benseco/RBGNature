@@ -60,24 +60,27 @@ namespace RBGNature.Actor
         public override void Update(GameTime gameTime)
         {
             collision.Position = camera.Position;
-            collision.Velocity = Vector2.Zero;
-            float speed = 3f;
+            float speed = .5f;
             float elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
             float distance = speed * elapsedTime;
+
+            Vector2 inputVelocity = Vector2.Zero;
 
             var kstate = Keyboard.GetState();
 
             if (kstate.IsKeyDown(Keys.W))
-                collision.Velocity.Y -= distance;
+                inputVelocity.Y -= distance;
 
             if (kstate.IsKeyDown(Keys.S))
-                collision.Velocity.Y += distance;
+                inputVelocity.Y += distance;
 
             if (kstate.IsKeyDown(Keys.A))
-                collision.Velocity.X -= distance;
+                inputVelocity.X -= distance;
 
             if (kstate.IsKeyDown(Keys.D))
-                collision.Velocity.X += distance;
+                inputVelocity.X += distance;
+
+            collision.Velocity = collision.Velocity * 0.7f + inputVelocity * 0.3f;
 
             camera.Move(collision.Velocity);
 
@@ -143,6 +146,7 @@ namespace RBGNature.Actor
         public void OnCollide(PhysicsGroupType groupType, CollisionResult collisionResult)
         {
             camera.Position = collisionResult.PositionA;
+            collision.Velocity = collisionResult.VelocityA;
         }
     }
 }
