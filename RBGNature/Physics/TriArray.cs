@@ -34,16 +34,19 @@ namespace RBGNature.Physics
 
         public override CollisionResult Collide(Circle c)
         {
-            int xIndex = (int)(c.Position.X / 20);
-            int yIndex = (int)(c.Position.Y / 20);
+            //int xIndex = (int)(c.Position.X / 20);
+            //int yIndex = (int)(c.Position.Y / 20);
             int xMin = (int)((c.Position.X - c.Radius) / 20);
-            int xMax = (int)((c.Position.X + c.Radius) / 20);
+            int xMax = (int)((c.Position.X + c.Velocity.X + c.Radius) / 20);
             int yMin = (int)((c.Position.Y - c.Radius) / 20);
-            int yMax = (int)((c.Position.Y + c.Radius) / 20);
+            int yMax = (int)((c.Position.Y + c.Velocity.Y + c.Radius) / 20);
 
-            Console.Write("Index: " + xIndex + ", " + yIndex);
-            Console.Write(" | XBounds: " + xMin + " - " + xMax);
-            Console.WriteLine(" | YBounds: " + yMin + " - " + yMax);
+            //Console.Write("Index: " + xIndex + ", " + yIndex);
+            //Console.Write(" | XBounds: " + xMin + " - " + xMax);
+            //Console.WriteLine(" | YBounds: " + yMin + " - " + yMax);
+
+            double time = 1;
+            CollisionResult first = CollisionResult.None;
 
             for (int i = yMin; i <= yMax; i++) //row
             {
@@ -56,13 +59,19 @@ namespace RBGNature.Physics
                     for (int k = 0; k < 4; k++) //subtriangle
                     {
                         if (array[i, j, k] != 1) continue; //triangle does not collide
-
-                        //if (GetTriangle(i, j, k).Intersects(c)) return CollisionResult.None;
+                        
+                        CollisionResult result = GetTriangle(i, j, k).CollideCircleAtTime(c, out double cTime);
+                        
+                        if (cTime <= time)
+                        {
+                            time = cTime;
+                            first = result;
+                        }
                     }
                 }
             }
 
-            return CollisionResult.None;
+            return first;
         }
 
         public override CollisionResult Collide(TriArray triArray)

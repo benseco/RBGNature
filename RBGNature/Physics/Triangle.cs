@@ -36,6 +36,30 @@ namespace RBGNature.Physics
             return s > 0 && t > 0 && (s + t) < 2 * A * sign;
         }
 
+        public CollisionResult CollideCircleAtTime(Circle circle, out double t)
+        {
+            PhysicsObject.TimeOfIntersection(circle.Position, circle.Velocity, A, B, out double tAB, out double uAB);
+            PhysicsObject.TimeOfIntersection(circle.Position, circle.Velocity, B, C, out double tBC, out double uBC);
+            PhysicsObject.TimeOfIntersection(circle.Position, circle.Velocity, C, A, out double tCA, out double uCA);
+
+
+
+            // Triangle with edge AB
+            // Circle with velocity vector CD and radius R
+            // P = intersection of AB and CD
+            // A = angle between AP and CP
+            // Q = the position of circle center at time of intersection 
+            // R / sin(A) = length(PQ)
+
+            // Q = t * AB (t is time of intersection)
+            // Edge with earliest t is first collision
+
+
+
+            t = 0;
+            return CollisionResult.None;
+        }
+
 
         //public bool Intersects(Circle c)
         //{
