@@ -94,6 +94,8 @@ namespace RBGNature.Actor.Map
 
         public DemoMap()
         {
+            //collisionData = new int[10,10,4];
+            //collisionData[5, 5, 1] = 1;
             collision = new TriArray(collisionData);
         }
 

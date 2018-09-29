@@ -38,25 +38,140 @@ namespace RBGNature.Physics
 
         public CollisionResult CollideCircleAtTime(Circle circle, out double t)
         {
-            PhysicsObject.TimeOfIntersection(circle.Position, circle.Velocity, A, B, out double tAB, out double uAB);
-            PhysicsObject.TimeOfIntersection(circle.Position, circle.Velocity, B, C, out double tBC, out double uBC);
-            PhysicsObject.TimeOfIntersection(circle.Position, circle.Velocity, C, A, out double tCA, out double uCA);
+            t = -1;
+
+            CollisionResult rAB = CollideCircleWithEdgeAtTime(circle, A, B, out double tAB);
+            CollisionResult rBC = CollideCircleWithEdgeAtTime(circle, B, C, out double tBC);
+            CollisionResult rCA = CollideCircleWithEdgeAtTime(circle, C, A, out double tCA);
+
+            CollisionResult earliestCollision = CollisionResult.None;
+            double earliestTime = 2d; //arbitrary
+
+            if (rAB && tAB < earliestTime)
+            {
+                earliestCollision = rAB;
+                earliestTime = tAB;
+            }
+            if (rBC && tBC < earliestTime)
+            {
+                earliestCollision = rBC;
+                earliestTime = tBC;
+            }
+            if (rCA && tCA < earliestTime)
+            {
+                earliestCollision = rCA;
+                earliestTime = tCA;
+            }
+
+            if (earliestTime < 2d) t = earliestTime;
+            return earliestCollision;
+
+        }
+
+        /*public CollisionResult CollideCircleWithEdgeAtTime(Circle circle, Vector2 I, Vector2 J, out double t)
+        {
+            t = -1;
+
+            // Circle moves along path MN
+            Vector2 M = circle.Position;
+            Vector2 N = circle.Position + circle.Velocity;
+            Vector2 MN = circle.Velocity;
+
+            double timeOfIntersection = -1;
+
+            if (!PhysicsObject.TimeOfIntersection(M, N, I, J, out timeOfIntersection, out double uCA)) return CollisionResult.None;
+
+            // The first colliding edge, in vector form
+            Vector2 IJ = J - I;
+
+            // Angle between MN and IJ
+            double a = Math.Atan2((MN.X * IJ.Y - MN.Y * IJ.X), Vector2.Dot(MN, IJ));
+
+            // Distance between center of circle and point of intersection at time t
+            double distCenterToIntersection = Math.Abs(circle.Radius / Math.Sin(a));
+
+            // Report the actual time of collision given the circle's radius
+            t = timeOfIntersection - (distCenterToIntersection / MN.Length());
+
+            if (t >= 0 && t <= 1)
+            {
+                // First two parameters are zero since we don't need to report collision info for the triangle itself
+                //TODO: new velocity for circle is more complex than just Vector2.Negate(MN)
+                return new CollisionResult(Vector2.Zero, Vector2.Zero, M + (float)(t - 0.01) * MN, Vector2.Negate(MN));
+            }
 
 
+            return CollisionResult.None;
+        }*/
 
-            // Triangle with edge AB
-            // Circle with velocity vector CD and radius R
-            // P = intersection of AB and CD
-            // A = angle between AP and CP
-            // Q = the position of circle center at time of intersection 
-            // R / sin(A) = length(PQ)
+        public CollisionResult CollideCircleWithEdgeAtTime(Circle circle, Vector2 I, Vector2 J, out double t)
+        {
+            t = -1; //arbitrary error case
 
-            // Q = t * AB (t is time of intersection)
-            // Edge with earliest t is first collision
+            // Circle moves along path MN
+            Vector2 M = circle.Position;
+            Vector2 N = circle.Position + circle.Velocity;
+            Vector2 MN = circle.Velocity;
 
+            // Collide with IJ translated by the normal of the circle's radius in length
+            Vector2 IJ = J - I;
+            Vector2 normIJ = new Vector2(IJ.Y, -IJ.X); //negate the Y value because the edge runs clockwise
+            normIJ.Normalize();
+            normIJ *= circle.Radius;
+            Vector2 P = I + normIJ;
+            Vector2 Q = J + normIJ;
 
+            double timeOfEdgeIntersection = -1;
+            bool intersectsEdge = PhysicsObject.TimeOfIntersection(M, N, P, Q, out timeOfEdgeIntersection, out double u);
+            if (!intersectsEdge || u < 0 || u > 1) timeOfEdgeIntersection = -1; // Invalid intersections
 
-            t = 0;
+            // Collide circle as point with a new circle with center I and the same radius as circle (corner circle)
+            //TODO: we shouldn't create an object every time - create a struct circle representation or equivalent method
+            Circle point = new Circle() { Position = circle.Position, Velocity = circle.Velocity };
+            Circle corner = new Circle() { Position = I, Radius = circle.Radius };
+            double timeOfCornerIntersection = -1;
+            point.CollideCircleAtTime(corner, out timeOfCornerIntersection);
+            
+            // Earliest wins
+            if (timeOfEdgeIntersection >= 0 && timeOfEdgeIntersection <= 1)
+            {
+                if (timeOfCornerIntersection >= 0 && timeOfCornerIntersection <= 1)
+                {
+                    if (timeOfEdgeIntersection < timeOfCornerIntersection)
+                    {
+                        // Collision at edge IJ came first
+                        t = timeOfEdgeIntersection;
+                        Vector2 newCirclePos = M + (float)t * MN - 0.5f * Vector2.Normalize(MN); //Separation of .5 unit
+                        //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
+                        return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
+                    }
+                    else
+                    {
+                        // Collision at corner I came first
+                        t = timeOfCornerIntersection;
+                        Vector2 newCirclePos = M + (float)t * MN - 0.5f * Vector2.Normalize(MN); //Separation of .5 unit
+                        //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
+                        return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
+                    }
+                }
+                else
+                {
+                    // Collision only at edge IJ
+                    t = timeOfEdgeIntersection;
+                    Vector2 newCirclePos = M + (float)t * MN - 0.5f * Vector2.Normalize(MN); //Separation of .5 unit
+                    //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
+                    return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
+                }
+            }
+            else if (timeOfCornerIntersection >= 0 && timeOfCornerIntersection <= 1)
+            {
+                // Collision only at corner I
+                t = timeOfCornerIntersection;
+                Vector2 newCirclePos = M + (float)t * MN - 0.5f * Vector2.Normalize(MN); //Separation of .5 unit
+                //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
+                return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
+            }
+
             return CollisionResult.None;
         }
 

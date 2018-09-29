@@ -19,9 +19,10 @@ namespace RBGNature.Physics
 
             switch (k)
             {
+                //These points should be listed in clockwise order
                 case 0: return new Triangle(j, i, j + w, i, j + w / 2, i + w / 2); //TOP
-                case 1: return new Triangle(j, i, j, i + w, j + w / 2, i + w / 2); //LEFT
-                case 2: return new Triangle(j, i + w, j + w, i + w, j + w / 2, i + w / 2); //BOTTOM
+                case 1: return new Triangle(j, i, j + w / 2, i + w / 2, j, i + w); //LEFT
+                case 2: return new Triangle(j, i + w, j + w / 2, i + w / 2, j + w, i + w); //BOTTOM
                 case 3: return new Triangle(j + w, i, j + w, i + w, j + w / 2, i + w / 2); //RIGHT
                 default: throw new InvalidOperationException(string.Format("Triangle.GetTriangle was called with k={0}. K must be in [0,3].",k));
             }
@@ -36,10 +37,10 @@ namespace RBGNature.Physics
         {
             //int xIndex = (int)(c.Position.X / 20);
             //int yIndex = (int)(c.Position.Y / 20);
-            int xMin = (int)((c.Position.X - c.Radius) / 20);
-            int xMax = (int)((c.Position.X + c.Velocity.X + c.Radius) / 20);
-            int yMin = (int)((c.Position.Y - c.Radius) / 20);
-            int yMax = (int)((c.Position.Y + c.Velocity.Y + c.Radius) / 20);
+            int xMin = (int)((c.Position.X - c.Radius) / 20) - 1;
+            int xMax = (int)((c.Position.X + c.Velocity.X + c.Radius) / 20) + 1;
+            int yMin = (int)((c.Position.Y - c.Radius) / 20) - 1;
+            int yMax = (int)((c.Position.Y + c.Velocity.Y + c.Radius) / 20) + 1;
 
             //Console.Write("Index: " + xIndex + ", " + yIndex);
             //Console.Write(" | XBounds: " + xMin + " - " + xMax);
@@ -62,7 +63,7 @@ namespace RBGNature.Physics
                         
                         CollisionResult result = GetTriangle(i, j, k).CollideCircleAtTime(c, out double cTime);
                         
-                        if (cTime <= time)
+                        if (result && cTime <= time)
                         {
                             time = cTime;
                             first = result;
@@ -82,7 +83,7 @@ namespace RBGNature.Physics
 
         public override CollisionResult Collide(PhysicsObject other)
         {
-            return other.Collide(this);
+            return other.Collide(this).Switch();
         }
     }
 }

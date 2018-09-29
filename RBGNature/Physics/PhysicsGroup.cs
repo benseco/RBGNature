@@ -24,35 +24,35 @@ namespace RBGNature.Physics
 
         public void Collide()
         {
-            var player = group[1];
-            CollisionResult result =
-                (new Circle()
-                {
-                    Position = new Microsoft.Xna.Framework.Vector2(200, 200),
-                    Radius = 100,
-                    Mass = 100000
-                }).Collide(player.GetCollisionObject(groupType));
-            if (result)
-            {
-                player.OnCollide(groupType, result.Switch());
-            }
-
-
-            //for (int i = 0; i < group.Count; i++)
-            //{
-            //    for (int j = i + 1; j < group.Count; j++)
+            //var player = group[1];
+            //CollisionResult result =
+            //    (new Circle()
             //    {
-            //        ICollide a = group[i];
-            //        ICollide b = group[j];
-
-            //        CollisionResult result = a.GetCollisionObject(groupType).Collide(b.GetCollisionObject(groupType));
-            //        if (result)
-            //        {
-            //            a.OnCollide(groupType, result);
-            //            b.OnCollide(groupType, result.Switch());
-            //        }
-            //    }
+            //        Position = new Microsoft.Xna.Framework.Vector2(200, 200),
+            //        Radius = 100,
+            //        Mass = 100000
+            //    }).Collide(player.GetCollisionObject(groupType));
+            //if (result)
+            //{
+            //    player.OnCollide(groupType, result.Switch());
             //}
+
+
+            for (int i = 0; i < group.Count; i++)
+            {
+                for (int j = i + 1; j < group.Count; j++)
+                {
+                    ICollide a = group[i];
+                    ICollide b = group[j];
+
+                    CollisionResult result = a.GetCollisionObject(groupType).Collide(b.GetCollisionObject(groupType));
+                    if (result)
+                    {
+                        a.OnCollide(groupType, result);
+                        b.OnCollide(groupType, result.Switch());
+                    }
+                }
+            }
         }
     }
 

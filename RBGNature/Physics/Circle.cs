@@ -13,6 +13,13 @@ namespace RBGNature.Physics
 
         public override CollisionResult Collide(Circle c)
         {
+            return CollideCircleAtTime(c, out double t);
+        }
+
+        public CollisionResult CollideCircleAtTime(Circle c, out double t)
+        {
+            t = -1;//arbitrary error case
+
             Vector2 vel = Velocity - c.Velocity;
             Vector2 pos = Position - c.Position;
 
@@ -31,25 +38,25 @@ namespace RBGNature.Physics
                 double legSquared = Math.Pow(Radius + c.Radius, 2) - (projection - Vector2.Zero).LengthSquared();
 
                 // The percentage of time in this step that passes before the collision
-                float time = (float) (1 - (legSquared / Vector2.DistanceSquared(pos, projection)));
+                t = 1 - (legSquared / Vector2.DistanceSquared(pos, projection));
 
                 // The position of the circles at time of collision
-                Vector2 newPos = Position + Velocity * time;
-                Vector2 cNewPos = c.Position + c.Velocity * time;
-                
+                Vector2 newPos = Position + Velocity * (float)t;
+                Vector2 cNewPos = c.Position + c.Velocity * (float)t;
+
                 // Calculate response (bounce)
 
                 // The norm of the vector between the two circles
                 Vector2 n = Vector2.Normalize(cNewPos - newPos);
-                
+
                 // impulse magnitude?
                 Vector2 deltaV = Velocity - c.Velocity;
                 float magnitude = deltaV.Length();
 
 
                 // Resultant velocities
-                Vector2 newV = Velocity - (1/Mass) * magnitude * n;
-                Vector2 cNewV = c.Velocity + (1/c.Mass) * magnitude * n;
+                Vector2 newV = Velocity - (1 / Mass) * magnitude * n;
+                Vector2 cNewV = c.Velocity + (1 / c.Mass) * magnitude * n;
 
                 // Add some separation (.1f is arbitrary ?)
                 newPos = newPos + newV * .1f;
