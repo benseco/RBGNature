@@ -91,7 +91,7 @@ namespace RBGNature.Actor.Map
         TriArray collision;
 
         Texture2D[] textureTri;
-
+        
         public DemoMap()
         {
             //collisionData = new int[10,10,4];
@@ -131,14 +131,14 @@ namespace RBGNature.Actor.Map
             }
         }
 
-        public PhysicsObject GetCollisionObject(PhysicsGroupType groupType)
+        public void Collide(PhysicsGroupType groupType, ICollide other)
         {
-            return collision;
+            other.Collide(groupType, collision);
         }
 
-        public void OnCollide(PhysicsGroupType groupType, CollisionResult collisionResult)
+        public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject)
         {
-
+            return physicsObject.Collide(collision).Switch();
         }
     }
 }

@@ -23,6 +23,11 @@ namespace RBGNature
             Position += direction;
         }
 
+        public void MoveTo(Vector2 newPos)
+        {
+            Position = newPos;
+        }
+
         public Matrix GetTransform()
         {
             var translationMatrix = Matrix.CreateTranslation(new Vector3(-Position.X, -Position.Y, 0));

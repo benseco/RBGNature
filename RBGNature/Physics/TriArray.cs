@@ -62,8 +62,8 @@ namespace RBGNature.Physics
                         if (array[i, j, k] != 1) continue; //triangle does not collide
                         
                         CollisionResult result = GetTriangle(i, j, k).CollideCircleAtTime(c, out double cTime);
-                        
-                        if (result && cTime <= time)
+
+                        if (result && cTime >= 0 && cTime <= time)
                         {
                             time = cTime;
                             first = result;

@@ -142,16 +142,16 @@ namespace RBGNature.Physics
                         // Collision at edge IJ came first
                         t = timeOfEdgeIntersection;
                         Vector2 newCirclePos = M + (float)t * MN - 0.5f * Vector2.Normalize(MN); //Separation of .5 unit
-                        //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
-                        return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
+                        return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
+                        //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
                     }
                     else
                     {
                         // Collision at corner I came first
                         t = timeOfCornerIntersection;
                         Vector2 newCirclePos = M + (float)t * MN - 0.5f * Vector2.Normalize(MN); //Separation of .5 unit
-                        //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
-                        return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
+                        return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
+                        //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
                     }
                 }
                 else
@@ -159,8 +159,8 @@ namespace RBGNature.Physics
                     // Collision only at edge IJ
                     t = timeOfEdgeIntersection;
                     Vector2 newCirclePos = M + (float)t * MN - 0.5f * Vector2.Normalize(MN); //Separation of .5 unit
-                    //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
-                    return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
+                    return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
+                    //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
                 }
             }
             else if (timeOfCornerIntersection >= 0 && timeOfCornerIntersection <= 1)
@@ -168,8 +168,8 @@ namespace RBGNature.Physics
                 // Collision only at corner I
                 t = timeOfCornerIntersection;
                 Vector2 newCirclePos = M + (float)t * MN - 0.5f * Vector2.Normalize(MN); //Separation of .5 unit
-                //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
-                return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
+                return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Negate(MN));
+                //return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, Vector2.Zero);
             }
 
             return CollisionResult.None;

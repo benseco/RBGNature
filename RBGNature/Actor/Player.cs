@@ -19,7 +19,7 @@ namespace RBGNature.Actor
         Camera camera;
         Texture2D textureMan;
         Texture2D textureBullet;
-        List<Tuple<Vector2,Vector2>> bullets;
+        List<Circle> bullets;
         Circle collision;
 
         Texture2D textureCircle10;
@@ -27,6 +27,7 @@ namespace RBGNature.Actor
 
         GunMode mode;
         private bool canChangeMode;
+
         public enum GunMode
         {
             Default,
@@ -40,7 +41,7 @@ namespace RBGNature.Actor
         public Player(Camera camera)
         {
             this.camera = camera;
-            this.bullets = new List<Tuple<Vector2, Vector2>>();
+            this.bullets = new List<Circle>();
             collision = new Circle()
             {
                 Radius = 10,
@@ -59,8 +60,10 @@ namespace RBGNature.Actor
 
         public override void Update(GameTime gameTime)
         {
-            collision.Position = camera.Position;
-            float speed = .5f;
+            collision.Position += collision.Velocity;
+            camera.MoveTo(collision.Position);
+
+            float speed = .15f;
             float elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
             float distance = speed * elapsedTime;
 
@@ -82,8 +85,6 @@ namespace RBGNature.Actor
 
             collision.Velocity = collision.Velocity * 0.7f + inputVelocity * 0.3f;
 
-            camera.Move(collision.Velocity);
-
 
             if (kstate.IsKeyDown(Keys.F))
             {
@@ -100,12 +101,16 @@ namespace RBGNature.Actor
             var mstate = Mouse.GetState();
             if (mstate.LeftButton == ButtonState.Pressed)
             {
-                bullets.Add(Tuple.Create(Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint), camera.Position));
+                bullets.Add(new Circle()
+                {
+                    Position = camera.Position,
+                    Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 2
+                });
             }
 
-            for (int i = 0; i < bullets.Count; i++)
+            foreach (Circle bullet in bullets)
             {
-                bullets[i] = Tuple.Create(bullets[i].Item1, bullets[i].Item1 * gameTime.ElapsedGameTime.Milliseconds / 2 + bullets[i].Item2);
+                bullet.Position += bullet.Velocity;
             }
 
         }
@@ -118,16 +123,16 @@ namespace RBGNature.Actor
 
             if (mode == GunMode.Default)
             {
-                foreach (Tuple<Vector2, Vector2> bullet in bullets)
+                foreach (Circle bullet in bullets)
                 {
-                    spriteBatch.Draw(textureBullet, bullet.Item2, RectBulletDefault, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
+                    spriteBatch.Draw(textureBullet, bullet.Position, RectBulletDefault, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
                 }
             }
             else if (mode == GunMode.Cannon)
             {
-                foreach (Tuple<Vector2, Vector2> bullet in bullets)
+                foreach (Circle bullet in bullets)
                 {
-                    spriteBatch.Draw(textureBullet, bullet.Item2, RectBulletCannon, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
+                    spriteBatch.Draw(textureBullet, bullet.Position, RectBulletCannon, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
                 }
 
             }
@@ -142,11 +147,55 @@ namespace RBGNature.Actor
             }
             return null;
         }
-        
-        public void OnCollide(PhysicsGroupType groupType, CollisionResult collisionResult)
+
+        public void Collide(PhysicsGroupType groupType, ICollide other)
         {
-            camera.Position = collisionResult.PositionA;
-            collision.Velocity = collisionResult.VelocityA;
+            if (groupType == PhysicsGroupType.Physical)
+            {
+                foreach (Circle bullet in bullets)
+                {
+                    CollisionResult bulletCollision = other.Collide(groupType, bullet);
+                    if (bulletCollision)
+                    {
+                        bullet.Position = bulletCollision.PositionB;
+                        bullet.Velocity = bulletCollision.VelocityB;
+                    }
+
+                }
+                CollisionResult playerCollision = other.Collide(groupType, this.collision);
+                if (playerCollision)
+                {
+                    collision.Position = playerCollision.PositionB;
+                    collision.Velocity = playerCollision.VelocityB;
+                }
+            }
+        }
+
+        public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject)
+        {
+            CollisionResult response = CollisionResult.None;
+            if (groupType == PhysicsGroupType.Physical)
+            {
+                foreach (Circle bullet in bullets)
+                {
+                    CollisionResult bulletCollision = physicsObject.Collide(bullet);
+                    if (bulletCollision)
+                    {
+                        bullet.Position = bulletCollision.PositionB;
+                        bullet.Velocity = bulletCollision.VelocityB;
+                        response = bulletCollision;
+                    }
+                }
+
+                CollisionResult playerCollision = physicsObject.Collide(collision);
+                if (playerCollision)
+                {
+                    collision.Position = playerCollision.PositionB;
+                    collision.Velocity = playerCollision.VelocityB;
+                    response = playerCollision;
+                }
+            }
+            return response;
         }
     }
 }
