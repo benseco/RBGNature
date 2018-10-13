@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using RBGNature.Actor.Enemy;
 using RBGNature.Actor.Map;
 using RBGNature.Physics;
 
@@ -30,13 +31,16 @@ namespace RBGNature.Actor.Scene
 
             map = new DemoMap();
             player = new Player(Camera);
+            TestEnemy enemy = new TestEnemy(new Vector2(200, 600));
 
             children.Add(map);
             children.Add(player);
+            children.Add(enemy);
 
             physical = new PhysicsGroup(PhysicsGroupType.Physical);
             physical.Add(map);
             physical.Add(player);
+            physical.Add(enemy);
         }
 
         public override void DrawParent(SpriteBatch spriteBatch)

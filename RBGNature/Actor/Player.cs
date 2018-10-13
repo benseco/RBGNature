@@ -104,7 +104,8 @@ namespace RBGNature.Actor
                 bullets.Add(new Circle()
                 {
                     Position = camera.Position,
-                    Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 2
+                    Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 2,
+                    Mass = 1,
                 });
             }
 
@@ -166,7 +167,7 @@ namespace RBGNature.Actor
                 if (playerCollision)
                 {
                     collision.Position = playerCollision.PositionB;
-                    collision.Velocity = playerCollision.VelocityB;
+                    collision.Velocity = playerCollision.VelocityB - collision.Velocity;
                 }
             }
         }
@@ -191,11 +192,11 @@ namespace RBGNature.Actor
                 if (playerCollision)
                 {
                     collision.Position = playerCollision.PositionB;
-                    collision.Velocity = playerCollision.VelocityB;
+                    collision.Velocity = playerCollision.VelocityB - collision.Velocity;
                     response = playerCollision;
                 }
             }
-            return response;
+            return response.Switch();
         }
     }
 }

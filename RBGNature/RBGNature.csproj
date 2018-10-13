@@ -44,6 +44,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Actor\BaseActor.cs" />
+    <Compile Include="Actor\Enemy\TestEnemy.cs" />
     <Compile Include="Actor\Map\DemoMap.cs" />
     <Compile Include="Actor\Map\TestMap.cs" />
     <Compile Include="Actor\ParentActor.cs" />
