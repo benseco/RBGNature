@@ -53,7 +53,6 @@ namespace RBGNature.Physics
                 Vector2 deltaV = Velocity - c.Velocity;
                 float magnitude = deltaV.Length();
 
-
                 // Resultant velocities
                 Vector2 newV = Velocity - (1 / Mass) * magnitude * n;
                 Vector2 cNewV = c.Velocity + (1 / c.Mass) * magnitude * n;

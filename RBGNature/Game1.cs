@@ -105,12 +105,21 @@ namespace RBGNature
             base.Update(gameTime);
         }
 
+        double previousFrameTime;
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            double currentFrameTime = gameTime.ElapsedGameTime.TotalSeconds;
+            if (currentFrameTime > previousFrameTime)
+            {
+                System.Console.WriteLine("Frame took too long: " + gameTime.ElapsedGameTime.TotalSeconds + "s");
+            }
+            previousFrameTime = currentFrameTime;
+
 
             // TODO: Add your drawing code here
 

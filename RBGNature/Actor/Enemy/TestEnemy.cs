@@ -46,7 +46,7 @@ namespace RBGNature.Actor.Enemy
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(textureFront, collision.Position - new Vector2(10, 30), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
+            spriteBatch.Draw(textureFront, collision.Position - new Vector2(10, 30), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
             spriteBatch.Draw(textureCircle10, collision.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
         }
 

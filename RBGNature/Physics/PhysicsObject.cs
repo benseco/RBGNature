@@ -11,7 +11,7 @@ namespace RBGNature.Physics
     {
         public Vector2 Position;
         public Vector2 Velocity;
-        public float Mass;
+        public float Mass = 1;
 
         // For now, PhysicsObject requires that all deriving classes be able to collide with each other
         public abstract CollisionResult Collide(Circle c);

@@ -118,7 +118,7 @@ namespace RBGNature.Actor
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(textureMan, camera.Position - new Vector2(10,30), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
+            spriteBatch.Draw(textureMan, camera.Position - new Vector2(10,30), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
             spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
@@ -126,14 +126,14 @@ namespace RBGNature.Actor
             {
                 foreach (Circle bullet in bullets)
                 {
-                    spriteBatch.Draw(textureBullet, bullet.Position, RectBulletDefault, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
+                    spriteBatch.Draw(textureBullet, bullet.Position, RectBulletDefault, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
                 }
             }
             else if (mode == GunMode.Cannon)
             {
                 foreach (Circle bullet in bullets)
                 {
-                    spriteBatch.Draw(textureBullet, bullet.Position, RectBulletCannon, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .5f);
+                    spriteBatch.Draw(textureBullet, bullet.Position, RectBulletCannon, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
                 }
 
             }
