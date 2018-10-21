@@ -7,17 +7,21 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Physics
 {
-    public struct CollisionResult
+    public class CollisionResult
     {
         public static CollisionResult None { get; } = new CollisionResult();
 
         private bool collides;
 
-        public readonly Vector2 PositionA;
-        public readonly Vector2 VelocityA;
+        public Vector2 PositionA;
+        public Vector2 VelocityA;
 
-        public readonly Vector2 PositionB;
-        public readonly Vector2 VelocityB;
+        public Vector2 PositionB;
+        public Vector2 VelocityB;
+
+        public CollisionIdentity Identity;
+
+        private CollisionResult() { }
 
         public CollisionResult(Vector2 positionA, Vector2 velocityA, Vector2 positionB, Vector2 velocityB)
         {

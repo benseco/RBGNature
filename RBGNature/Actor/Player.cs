@@ -20,7 +20,7 @@ namespace RBGNature.Actor
         Texture2D textureMan;
         Texture2D textureBullet;
         List<Circle> bullets;
-        Circle collision;
+        public Circle collision;
 
         Texture2D textureCircle10;
         Texture2D textureCircle200;
@@ -155,7 +155,7 @@ namespace RBGNature.Actor
             {
                 foreach (Circle bullet in bullets)
                 {
-                    CollisionResult bulletCollision = other.Collide(groupType, bullet);
+                    CollisionResult bulletCollision = other.Collide(groupType, bullet, null);
                     if (bulletCollision)
                     {
                         bullet.Position = bulletCollision.PositionB;
@@ -163,7 +163,7 @@ namespace RBGNature.Actor
                     }
 
                 }
-                CollisionResult playerCollision = other.Collide(groupType, this.collision);
+                CollisionResult playerCollision = other.Collide(groupType, this.collision, null);
                 if (playerCollision)
                 {
                     collision.Position = playerCollision.PositionB;
@@ -172,7 +172,7 @@ namespace RBGNature.Actor
             }
         }
 
-        public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject)
+        public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
         {
             CollisionResult response = CollisionResult.None;
             if (groupType == PhysicsGroupType.Physical)

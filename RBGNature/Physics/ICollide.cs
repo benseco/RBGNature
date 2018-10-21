@@ -9,6 +9,6 @@ namespace RBGNature.Physics
     interface ICollide
     {
         void Collide(PhysicsGroupType groupType, ICollide other);
-        CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject);
+        CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity);
     }
 }

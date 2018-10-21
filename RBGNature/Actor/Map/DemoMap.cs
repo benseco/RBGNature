@@ -134,10 +134,10 @@ namespace RBGNature.Actor.Map
 
         public void Collide(PhysicsGroupType groupType, ICollide other)
         {
-            other.Collide(groupType, collision);
+            other.Collide(groupType, collision, null);
         }
 
-        public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject)
+        public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
         {
             return physicsObject.Collide(collision).Switch();
         }

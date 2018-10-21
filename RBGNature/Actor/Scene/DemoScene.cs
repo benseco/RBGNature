@@ -31,7 +31,7 @@ namespace RBGNature.Actor.Scene
 
             map = new DemoMap();
             player = new Player(Camera);
-            TestEnemy enemy = new TestEnemy(new Vector2(200, 600));
+            TestEnemy enemy = new TestEnemy(new Vector2(200, 600), player);
 
             children.Add(map);
             children.Add(player);

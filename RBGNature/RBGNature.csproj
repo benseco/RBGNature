@@ -54,6 +54,7 @@
     <Compile Include="Game1.cs" />
     <Compile Include="Actor\Player.cs" />
     <Compile Include="Physics\Circle.cs" />
+    <Compile Include="Physics\CollisionIdentity.cs" />
     <Compile Include="Physics\CollisionResult.cs" />
     <Compile Include="Physics\ICollide.cs" />
     <Compile Include="Physics\PhysicsGroup.cs" />
