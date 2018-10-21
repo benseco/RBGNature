@@ -28,6 +28,8 @@ namespace RBGNature.Actor
         GunMode mode;
         private bool canChangeMode;
 
+        private int timeBetweenShots;
+
         public enum GunMode
         {
             Default,
@@ -64,7 +66,7 @@ namespace RBGNature.Actor
             camera.MoveTo(collision.Position);
 
             float speed = .15f;
-            float elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
+            int elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
             float distance = speed * elapsedTime;
 
             Vector2 inputVelocity = Vector2.Zero;
@@ -99,12 +101,14 @@ namespace RBGNature.Actor
 
 
             var mstate = Mouse.GetState();
-            if (mstate.LeftButton == ButtonState.Pressed)
+            timeBetweenShots += elapsedTime;
+            if (mstate.LeftButton == ButtonState.Pressed && timeBetweenShots > 100)
             {
+                timeBetweenShots = 0;
                 bullets.Add(new Circle()
                 {
                     Position = camera.Position,
-                    Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 2,
+                    Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 4,
                     Mass = 1,
                 });
             }
@@ -153,13 +157,15 @@ namespace RBGNature.Actor
         {
             if (groupType == PhysicsGroupType.Physical)
             {
-                foreach (Circle bullet in bullets)
+                for (int i = bullets.Count - 1; i >= 0; i--)
                 {
+                    Circle bullet = bullets[i];
                     CollisionResult bulletCollision = other.Collide(groupType, bullet, null);
                     if (bulletCollision)
                     {
-                        bullet.Position = bulletCollision.PositionB;
-                        bullet.Velocity = bulletCollision.VelocityB;
+                        bullets.RemoveAt(i);
+                        //bullet.Position = bulletCollision.PositionB;
+                        //bullet.Velocity = bulletCollision.VelocityB;
                     }
 
                 }
@@ -177,13 +183,15 @@ namespace RBGNature.Actor
             CollisionResult response = CollisionResult.None;
             if (groupType == PhysicsGroupType.Physical)
             {
-                foreach (Circle bullet in bullets)
+                for (int i = bullets.Count - 1; i >= 0; i--)
                 {
+                    Circle bullet = bullets[i];
                     CollisionResult bulletCollision = physicsObject.Collide(bullet);
                     if (bulletCollision)
                     {
-                        bullet.Position = bulletCollision.PositionB;
-                        bullet.Velocity = bulletCollision.VelocityB;
+                        bullets.RemoveAt(i);
+                        //bullet.Position = bulletCollision.PositionB;
+                        //bullet.Velocity = bulletCollision.VelocityB;
                         response = bulletCollision;
                     }
                 }
