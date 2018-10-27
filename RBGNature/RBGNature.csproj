@@ -50,6 +50,8 @@
     <Compile Include="Actor\ParentActor.cs" />
     <Compile Include="Actor\Scene\BaseScene.cs" />
     <Compile Include="Actor\Scene\DemoScene.cs" />
+    <Compile Include="Graphics\Animation.cs" />
+    <Compile Include="Graphics\Animator.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Actor\Player.cs" />

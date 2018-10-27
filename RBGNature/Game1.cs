@@ -135,7 +135,7 @@ namespace RBGNature
             //spriteBatch.End();
 
             spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: scene.Camera.GetTransform(), sortMode: SpriteSortMode.FrontToBack);
-            scene.Draw(spriteBatch);
+            scene.Draw(gameTime, spriteBatch);
             spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(null);

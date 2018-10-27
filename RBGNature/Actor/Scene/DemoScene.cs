@@ -43,7 +43,7 @@ namespace RBGNature.Actor.Scene
             physical.Add(enemy);
         }
 
-        public override void DrawParent(SpriteBatch spriteBatch)
+        public override void DrawParent(GameTime gameTime, SpriteBatch spriteBatch)
         {
         }
 

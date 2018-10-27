@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using RBGNature.Graphics;
 using RBGNature.Physics;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,23 @@ namespace RBGNature.Actor
 {
     class Player : BaseActor, ICollide
     {
+        enum RunAnimation
+        {
+            Front
+        }
+        
         static readonly Rectangle RectBulletDefault = new Rectangle(0, 0, 6, 6);
         static readonly Rectangle RectBulletCannon = new Rectangle(6, 0, 9, 9);
 
+        static Animation<RunAnimation> runAnimation;
+
         Camera camera;
+        Texture2D texture_mc_run_front;
         Texture2D textureMan;
         Texture2D textureBullet;
+
+        Animator animator;
+
         List<Circle> bullets;
         public Circle collision;
 
@@ -40,6 +52,12 @@ namespace RBGNature.Actor
             Laser
         }
 
+        static Player()
+        {
+            runAnimation = new Animation<RunAnimation>(14, 38);
+            runAnimation.Add(RunAnimation.Front, numFrames: 12);
+        }
+
         public Player(Camera camera)
         {
             this.camera = camera;
@@ -50,11 +68,14 @@ namespace RBGNature.Actor
                 Position = new Vector2(camera.Position.X, camera.Position.Y),
                 Mass = 1
             };
+
+            animator = new Animator(runAnimation.Get(RunAnimation.Front), 100);
         }
 
         public override void LoadContent(ContentManager contentManager)
         {
             textureMan = contentManager.Load<Texture2D>("Sprites/mc/front");
+            runAnimation.Load(contentManager, "Sprites/mc/mc_run_front");
             textureBullet = contentManager.Load<Texture2D>("Sprites/bullet/bullet");
             textureCircle10 = contentManager.Load<Texture2D>("Sprites/debug/circle10");
             textureCircle200 = contentManager.Load<Texture2D>("Sprites/debug/circle200");
@@ -120,9 +141,10 @@ namespace RBGNature.Actor
 
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(textureMan, camera.Position - new Vector2(10,30), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
+            spriteBatch.Draw(runAnimation.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(gameTime), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
+
             spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 

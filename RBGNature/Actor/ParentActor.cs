@@ -25,15 +25,15 @@ namespace RBGNature.Actor
             this.UpdateParent(gameTime);
         }
 
-        public sealed override void Draw(SpriteBatch spriteBatch)
+        public sealed override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            children.ForEach(s => s.Draw(spriteBatch));
-            this.DrawParent(spriteBatch);
+            children.ForEach(s => s.Draw(gameTime, spriteBatch));
+            this.DrawParent(gameTime, spriteBatch);
         }
 
         public abstract void LoadContentParent(ContentManager contentManager);
         public abstract void UpdateParent(GameTime gameTime);
-        public abstract void DrawParent(SpriteBatch spriteBatch);
+        public abstract void DrawParent(GameTime gameTime, SpriteBatch spriteBatch);
 
     }
 }

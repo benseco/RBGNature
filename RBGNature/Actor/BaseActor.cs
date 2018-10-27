@@ -13,7 +13,7 @@ namespace RBGNature.Actor
     {
         public abstract void LoadContent(ContentManager contentManager);
         public abstract void Update(GameTime gameTime);
-        public abstract void Draw(SpriteBatch spriteBatch);
+        public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
 
         protected static float LayerDepth(float y)
         {
