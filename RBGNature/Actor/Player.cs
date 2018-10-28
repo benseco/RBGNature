@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using RBGNature.Graphics;
+using RBGNature.Graphics.Animation;
 using RBGNature.Physics;
 using System;
 using System.Collections.Generic;
@@ -16,16 +17,16 @@ namespace RBGNature.Actor
     {
         enum RunAnimation
         {
-            Front
+            Front,
+            Back
         }
         
         static readonly Rectangle RectBulletDefault = new Rectangle(0, 0, 6, 6);
         static readonly Rectangle RectBulletCannon = new Rectangle(6, 0, 9, 9);
 
-        static Animation<RunAnimation> runAnimation;
+        static AnimationDictionary<RunAnimation> animDict_Run;
 
         Camera camera;
-        Texture2D texture_mc_run_front;
         Texture2D textureMan;
         Texture2D textureBullet;
 
@@ -54,8 +55,9 @@ namespace RBGNature.Actor
 
         static Player()
         {
-            runAnimation = new Animation<RunAnimation>(14, 38);
-            runAnimation.Add(RunAnimation.Front, numFrames: 12);
+            animDict_Run = new AnimationDictionary<RunAnimation>();
+            animDict_Run[RunAnimation.Front] = new Animation("Sprites/mc/mc_run_front", 100, 8, 14, 38);
+            animDict_Run[RunAnimation.Back] = new Animation("Sprites/mc/mc_run_back", 100, 8, 14, 38);
         }
 
         public Player(Camera camera)
@@ -69,13 +71,14 @@ namespace RBGNature.Actor
                 Mass = 1
             };
 
-            animator = new Animator(runAnimation.Get(RunAnimation.Front), 100);
+            animator = new Animator(animDict_Run[RunAnimation.Front]);
         }
 
         public override void LoadContent(ContentManager contentManager)
         {
+            animDict_Run.Load(contentManager);
+
             textureMan = contentManager.Load<Texture2D>("Sprites/mc/front");
-            runAnimation.Load(contentManager, "Sprites/mc/mc_run_front");
             textureBullet = contentManager.Load<Texture2D>("Sprites/bullet/bullet");
             textureCircle10 = contentManager.Load<Texture2D>("Sprites/debug/circle10");
             textureCircle200 = contentManager.Load<Texture2D>("Sprites/debug/circle200");
@@ -86,7 +89,7 @@ namespace RBGNature.Actor
             collision.Position += collision.Velocity;
             camera.MoveTo(collision.Position);
 
-            float speed = .15f;
+            float speed = .05f;
             int elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
             float distance = speed * elapsedTime;
 
@@ -95,17 +98,26 @@ namespace RBGNature.Actor
             var kstate = Keyboard.GetState();
 
             if (kstate.IsKeyDown(Keys.W))
+            {
                 inputVelocity.Y -= distance;
+                animator.Animate(animDict_Run[RunAnimation.Back]);
+            }
 
             if (kstate.IsKeyDown(Keys.S))
+            {
                 inputVelocity.Y += distance;
+                animator.Animate(animDict_Run[RunAnimation.Front]);
+            }
 
             if (kstate.IsKeyDown(Keys.A))
+            {
                 inputVelocity.X -= distance;
+            }
 
             if (kstate.IsKeyDown(Keys.D))
+            {
                 inputVelocity.X += distance;
-
+            }
             collision.Velocity = collision.Velocity * 0.7f + inputVelocity * 0.3f;
 
 
@@ -143,7 +155,7 @@ namespace RBGNature.Actor
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(runAnimation.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(gameTime), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
+            spriteBatch.Draw(animator.Animation.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(gameTime), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
 
             spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);

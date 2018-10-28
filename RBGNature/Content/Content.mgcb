@@ -253,6 +253,30 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/enemy/effect/square flower - corrupt bullet.png
 
+#begin Sprites/mc/mc_walk_front.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/mc/mc_walk_front.png
+
+#begin Sprites/mc/mc_run_back.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/mc/mc_run_back.png
+
 #begin Sprites/mc/mc_run_front.png
 /importer:TextureImporter
 /processor:TextureProcessor

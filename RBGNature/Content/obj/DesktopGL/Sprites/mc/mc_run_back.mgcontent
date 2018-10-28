@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Sprites/mc/mc_run_front.png</SourceFile>
-  <SourceTime>2018-10-28T12:43:44.4513933-05:00</SourceTime>
-  <DestFile>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/bin/DesktopGL/Sprites/mc/mc_run_front.xnb</DestFile>
-  <DestTime>2018-10-28T12:46:51.8290856-05:00</DestTime>
+  <SourceFile>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/Sprites/mc/mc_run_back.png</SourceFile>
+  <SourceTime>2018-10-28T12:43:44.448402-05:00</SourceTime>
+  <DestFile>C:/Users/Ben/source/repos/RBGNature/RBGNature/Content/bin/DesktopGL/Sprites/mc/mc_run_back.xnb</DestFile>
+  <DestTime>2018-10-28T12:46:51.8190809-05:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2017-03-01T09:05:36-06:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
