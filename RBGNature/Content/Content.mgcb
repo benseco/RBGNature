@@ -289,3 +289,10 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/mc/mc_run_front.png
 
+#begin Fonts/TooMuchInk.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/TooMuchInk.spritefont
+

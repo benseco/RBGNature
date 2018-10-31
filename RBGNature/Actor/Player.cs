@@ -89,7 +89,7 @@ namespace RBGNature.Actor
             collision.Position += collision.Velocity;
             camera.MoveTo(collision.Position);
 
-            float speed = .05f;
+            float speed = .15f;
             int elapsedTime = gameTime.ElapsedGameTime.Milliseconds;
             float distance = speed * elapsedTime;
 

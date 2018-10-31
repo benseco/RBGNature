@@ -43,12 +43,29 @@ namespace RBGNature.Actor.Scene
             physical.Add(enemy);
         }
 
+        int textElapsedTime = 0;
+        int timeBetweenCharacters = 100;
         public override void DrawParent(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            string text = "Hello world!";
+
+            textElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
+
+            int numChars = textElapsedTime / timeBetweenCharacters;
+            if (numChars > text.Length)
+            {
+                numChars = text.Length;
+                textElapsedTime = 0;
+            }
+            text = text.Substring(0, numChars);
+
+            spriteBatch.DrawString(font, text, new Vector2(200, 550), Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
         }
 
+        SpriteFont font;
         public override void LoadContentParent(ContentManager contentManager)
         {
+            font = contentManager.Load<SpriteFont>("Fonts/TooMuchInk");
         }
 
         public override void UpdateParent(GameTime gameTime)
