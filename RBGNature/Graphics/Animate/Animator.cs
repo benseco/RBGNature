@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RBGNature.Graphics.Animation
+namespace RBGNature.Graphics.Animate
 {
     public class Animator
     {

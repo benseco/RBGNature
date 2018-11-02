@@ -8,16 +8,21 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using RBGNature.Actor.Enemy;
 using RBGNature.Actor.Map;
+using RBGNature.Graphics.Text;
 using RBGNature.Physics;
 
 namespace RBGNature.Actor.Scene
 {
     class DemoScene : BaseScene
     {
+        const string example = "The {Jitter:quick} {Brown,Bold:brown fox} {Fast.30:jumped} {Wait.1000,Wave:over} the {Slow:lazy} dog.";
+
         DemoMap map;
         Player player;
 
         PhysicsGroup physical;
+
+        FragmentWriter writer;
 
         public DemoScene()
         {
@@ -41,25 +46,29 @@ namespace RBGNature.Actor.Scene
             physical.Add(map);
             physical.Add(player);
             physical.Add(enemy);
+
+            writer = new FragmentWriter(example);
         }
 
         int textElapsedTime = 0;
         int timeBetweenCharacters = 100;
         public override void DrawParent(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            string text = "Hello world!";
+            //string text = "Hello world!";
 
-            textElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
+            //textElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
-            int numChars = textElapsedTime / timeBetweenCharacters;
-            if (numChars > text.Length)
-            {
-                numChars = text.Length;
-                textElapsedTime = 0;
-            }
-            text = text.Substring(0, numChars);
+            //int numChars = textElapsedTime / timeBetweenCharacters;
+            //if (numChars > text.Length)
+            //{
+            //    numChars = text.Length;
+            //    textElapsedTime = 0;
+            //}
+            //text = text.Substring(0, numChars);
 
-            spriteBatch.DrawString(font, text, new Vector2(200, 550), Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
+            //spriteBatch.DrawString(font, text, new Vector2(200, 550), Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
+
+            writer.Draw(spriteBatch, gameTime, font, new Vector2(100, 450), Color.White);
         }
 
         SpriteFont font;

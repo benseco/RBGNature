@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using RBGNature.Graphics;
-using RBGNature.Graphics.Animation;
+using RBGNature.Graphics.Animate;
 using RBGNature.Physics;
 using System;
 using System.Collections.Generic;
