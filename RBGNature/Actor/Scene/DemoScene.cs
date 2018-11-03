@@ -15,7 +15,7 @@ namespace RBGNature.Actor.Scene
 {
     class DemoScene : BaseScene
     {
-        const string example = "The {Jitter:quick} {Brown,Bold:brown fox} {Fast.30:jumped} {Wait.1000,Wave:over} the {Slow:lazy} dog.";
+        const string example = "The {Jitter:quick} {Color.Brown,Bold:brown fox} {Fast.30:jumped} {Wait.1000,Slow.500:...}{Wave:over} the {Slow.500,Color.0|255|127|50:lazy} dog.";
 
         DemoMap map;
         Player player;
@@ -47,34 +47,17 @@ namespace RBGNature.Actor.Scene
             physical.Add(player);
             physical.Add(enemy);
 
-            writer = new FragmentWriter(example);
+            writer = new FragmentWriter("Fonts/TooMuchInk", example, new Rectangle(100, 450, 200, 200), Color.White);
         }
 
-        int textElapsedTime = 0;
-        int timeBetweenCharacters = 100;
         public override void DrawParent(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            //string text = "Hello world!";
-
-            //textElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
-
-            //int numChars = textElapsedTime / timeBetweenCharacters;
-            //if (numChars > text.Length)
-            //{
-            //    numChars = text.Length;
-            //    textElapsedTime = 0;
-            //}
-            //text = text.Substring(0, numChars);
-
-            //spriteBatch.DrawString(font, text, new Vector2(200, 550), Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
-
-            writer.Draw(spriteBatch, gameTime, font, new Vector2(100, 450), Color.White);
+            writer.Draw(spriteBatch, gameTime);
         }
 
-        SpriteFont font;
         public override void LoadContentParent(ContentManager contentManager)
         {
-            font = contentManager.Load<SpriteFont>("Fonts/TooMuchInk");
+            writer.Load(contentManager);
         }
 
         public override void UpdateParent(GameTime gameTime)

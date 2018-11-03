@@ -31,6 +31,8 @@ namespace RBGNature.Graphics.Text
 
         public Vector2 Draw(SpriteBatch spriteBatch, SpriteFont font, Vector2 position, Color color)
         {
+            if (Effect != null && Effect.Color != default(Color)) color = Effect.Color;
+
             for (int i = 0; i < Index; i++)
             {
                 string str = Text[i].ToString();
@@ -46,7 +48,7 @@ namespace RBGNature.Graphics.Text
                     }
                 }
                 
-                spriteBatch.DrawString(font, str, strPos, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
+                spriteBatch.DrawString(font, str, strPos, color, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
                 position.X += font.MeasureString(str).X;
             }
 

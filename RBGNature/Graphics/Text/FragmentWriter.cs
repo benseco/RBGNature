@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -9,20 +10,33 @@ using System.Threading.Tasks;
 namespace RBGNature.Graphics.Text
 {
 
-    class FragmentWriter
+    public class FragmentWriter
     {
         const char SPACE = ' ';
         const char BRACE_LEFT = '{';
         const char BRACE_RIGHT = '}';
         const char COLON = ':';
 
-        int Index { get; set; }
-        int Length { get; set; }
+        SpriteFont Font { get; set; }
+        Rectangle TextArea { get; set; }
+        Color Color { get; set; }
         int Speed { get; set; }
+
         List<Fragment> Fragments { get; set; }
 
-        public FragmentWriter(string source, int speed = 100)
+        private string FontKey { get; set; }
+        private int Index { get; set; }
+        private Vector2 Position { get; set; }
+        private Vector2 Space { get; set; }
+        private Vector2 Origin { get; set; }
+
+        public FragmentWriter(string fontKey, string source, Rectangle textArea, Color color, int speed = 100)
         {
+            FontKey = fontKey;
+            TextArea = textArea;
+            Origin = textArea.Location.ToVector2();
+            Position = Origin;
+            Color = color;
             Speed = speed;
             Index = 0;
             ParseFragments(source);
@@ -73,30 +87,41 @@ namespace RBGNature.Graphics.Text
             {
                 Fragments.Add(new Fragment(currentWord.ToString(), null));
             }
-
-            foreach (Fragment fragment in Fragments)
-            {
-                Length += fragment.Text.Length;
-            }
         }
 
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime, SpriteFont font, Vector2 position, Color color)
+        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            Vector2 space = font.MeasureString(SPACE.ToString());
-            
+            Position = Origin;
+
             // Calculate new Index
             Fragment currentFragment = Fragments[Index];
             bool fragmentDone = !currentFragment.UpdateIndex(gameTime.ElapsedGameTime.Milliseconds, Speed);
-            if (fragmentDone && Index < Fragments.Count - 1) Index++;
+            if (fragmentDone && Index < Fragments.Count - 1)
+            {
+                Index++;
+            }
 
             // Actually do the Draw
             for (int i = 0; i <= Index; i++)
             {
                 Fragment fragment = Fragments[i];
-                position = fragment.Draw(spriteBatch, font, position, Color.White);
-                position.X += space.X;
+
+                Vector2 fragmentLength = Font.MeasureString(fragment.Text);
+                if (Position.X + fragmentLength.X - Origin.X > TextArea.Width)
+                {
+                    Position = new Vector2(Origin.X, Position.Y + Font.LineSpacing);
+                }
+
+                Position = fragment.Draw(spriteBatch, Font, Position, Color);
+                Position += new Vector2(Space.X, 0);
             }
 
+        }
+
+        public void Load(ContentManager contentManager)
+        {
+            Font = contentManager.Load<SpriteFont>(FontKey);
+            Space = Font.MeasureString(SPACE.ToString());
         }
     }
 }
