@@ -17,14 +17,6 @@ namespace RBGNature.Physics
         public abstract CollisionResult Collide(Circle c);
         public abstract CollisionResult Collide(TriArray triArray);
 
-        /// <summary>
-        /// Navigates collision to derived class. Standard implementation is:
-        /// public override CollisionResult Collide(PhysicsObject other) { return other.Collide(this).Switch(); }
-        /// </summary>
-        /// <param name="other">The other Physics object in this collision</param>
-        /// <returns></returns>
-        public abstract CollisionResult Collide(PhysicsObject other);
-
         public static Vector2 ClosestOnSegment(Vector2 A, Vector2 B, Vector2 P)
         {
             Vector2 AP = P - A;       //Vector from A to P   

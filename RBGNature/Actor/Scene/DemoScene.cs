@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using RBGNature.Actor.Enemy;
+using RBGNature.Actor.Interactible;
 using RBGNature.Actor.Map;
 using RBGNature.Graphics.Text;
 using RBGNature.Physics;
@@ -37,15 +38,19 @@ namespace RBGNature.Actor.Scene
             map = new DemoMap();
             player = new Player(Camera);
             TestEnemy enemy = new TestEnemy(new Vector2(200, 600), player);
-
+            //WalkingEnemy enemy2 = new WalkingEnemy(new Vector2(300, 600), player);
+            Item item = new Item(player, new Vector2(100, 500));
             children.Add(map);
             children.Add(player);
             children.Add(enemy);
+            //children.Add(enemy2);
+            children.Add(item);
 
             physical = new PhysicsGroup(PhysicsGroupType.Physical);
             physical.Add(map);
             physical.Add(player);
             physical.Add(enemy);
+            //physical.Add(enemy2);
 
             writer = new FragmentWriter("Fonts/TooMuchInk", example, new Rectangle(100, 450, 200, 200), Color.White);
         }

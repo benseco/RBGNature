@@ -10,7 +10,7 @@ using RBGNature.Physics;
 
 namespace RBGNature.Actor.Enemy
 {
-    class TestEnemy : BaseActor, ICollide
+    class WalkingEnemy : BaseActor, ICollide
     {
         Circle collision;
         Texture2D textureFront;
@@ -22,24 +22,26 @@ namespace RBGNature.Actor.Enemy
         public int CurrentHealth { get; private set; }
         const int MaxHealth = 15;
         bool tookDamage = false;
+        Random random;
 
         static CollisionIdentity bulletIdentity = new CollisionIdentity()
         {
             Damage = 1
         };
 
-        public TestEnemy(Vector2 position, Player player)
+        public WalkingEnemy(Vector2 position, Player player)
         {
             collision = new Circle()
             {
                 Position = position,
                 Velocity = Vector2.Zero,
                 Radius = 10,
-                Mass = 1000000
+                Mass = 1
             };
             this.player = player;
             bullets = new List<Circle>();
             CurrentHealth = MaxHealth;
+            random = new Random(234);
         }
 
         public void Collide(PhysicsGroupType groupType, ICollide other)
@@ -60,6 +62,8 @@ namespace RBGNature.Actor.Enemy
                 CollisionResult result = other.Collide(groupType, collision, null);
                 if (result)
                 {
+                    collision.Position = result.PositionA;
+                    collision.Velocity = result.VelocityA - collision.Velocity;
                     takeDamage(result.Identity);
                 }
             }
@@ -86,6 +90,8 @@ namespace RBGNature.Actor.Enemy
                 CollisionResult result = physicsObject.Collide(collision);
                 if (result)
                 {
+                    collision.Position = result.PositionB;
+                    collision.Velocity = result.VelocityB - collision.Velocity;
                     takeDamage(identity);
                     response = result;
                 }
@@ -151,6 +157,8 @@ namespace RBGNature.Actor.Enemy
 
         public override void Update(GameTime gameTime)
         {
+            collision.Position += collision.Velocity;
+            collision.Velocity = new Vector2(random.Next(-2, 3), random.Next(-2, 3)) * 0.05f + collision.Velocity * 0.92f + Vector2.Normalize((player.collision.Position - collision.Position)) * 0.03f;
             foreach (Circle bullet in bullets)
             {
                 bullet.Position += bullet.Velocity;

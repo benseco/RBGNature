@@ -73,11 +73,6 @@ namespace RBGNature.Physics
             return triArray.Collide(this).Switch();
         }
 
-        public override CollisionResult Collide(PhysicsObject other)
-        {
-            return other.Collide(this).Switch();
-        }
-
         /// <summary>
         /// Determines if this Circle intersects a given line segment AB
         /// </summary>

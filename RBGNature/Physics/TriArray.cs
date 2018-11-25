@@ -77,13 +77,7 @@ namespace RBGNature.Physics
 
         public override CollisionResult Collide(TriArray triArray)
         {
-            //This should never occur as of now, so throw error.
             throw new NotImplementedException();
-        }
-
-        public override CollisionResult Collide(PhysicsObject other)
-        {
-            return other.Collide(this).Switch();
         }
     }
 }

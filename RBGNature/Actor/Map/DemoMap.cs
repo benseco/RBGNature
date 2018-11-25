@@ -139,7 +139,7 @@ namespace RBGNature.Actor.Map
 
         public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
         {
-            return physicsObject.Collide(collision).Switch();
+            return physicsObject.Collide(collision);
         }
     }
 }
