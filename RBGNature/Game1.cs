@@ -15,7 +15,10 @@ namespace RBGNature
         SpriteBatch spriteBatch;
         RenderTarget2D renderTarget;
         BaseScene scene;
-        
+
+        private static bool Paused { get; set; }
+        private static bool JustPaused { get; set; }
+
         int[,,] collision = {
             {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}},
             {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}},
@@ -34,6 +37,13 @@ namespace RBGNature
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+        }
+
+        public static void TogglePause()
+        {
+            if (JustPaused) return;
+            Paused = !Paused;
+            JustPaused = true;
         }
 
         /// <summary>
@@ -98,6 +108,14 @@ namespace RBGNature
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Start == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.OemTilde))
+            {
+                TogglePause();
+            }
+            else { JustPaused = false; }
+
+            if (Paused) return;
 
             // TODO: Add your update logic here
             scene.Update(gameTime);

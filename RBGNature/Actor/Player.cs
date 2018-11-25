@@ -26,6 +26,11 @@ namespace RBGNature.Actor
 
         static AnimationDictionary<RunAnimation> animDict_Run;
 
+        static CollisionIdentity bulletIdentity = new CollisionIdentity()
+        {
+            Damage = 1
+        };
+
         Camera camera;
         Texture2D textureMan;
         Texture2D textureBullet;
@@ -151,11 +156,12 @@ namespace RBGNature.Actor
                 bullet.Position += bullet.Velocity;
             }
 
+            animator.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(animator.Animation.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(gameTime), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
+            spriteBatch.Draw(animator.Animation.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
 
             spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
@@ -194,7 +200,7 @@ namespace RBGNature.Actor
                 for (int i = bullets.Count - 1; i >= 0; i--)
                 {
                     Circle bullet = bullets[i];
-                    CollisionResult bulletCollision = other.Collide(groupType, bullet, null);
+                    CollisionResult bulletCollision = other.Collide(groupType, bullet, bulletIdentity);
                     if (bulletCollision)
                     {
                         bullets.RemoveAt(i);
@@ -226,6 +232,7 @@ namespace RBGNature.Actor
                         bullets.RemoveAt(i);
                         //bullet.Position = bulletCollision.PositionB;
                         //bullet.Velocity = bulletCollision.VelocityB;
+                        bulletCollision.Identity = bulletIdentity;
                         response = bulletCollision;
                     }
                 }

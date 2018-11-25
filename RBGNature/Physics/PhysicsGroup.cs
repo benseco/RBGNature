@@ -22,6 +22,11 @@ namespace RBGNature.Physics
             group.Add(actor);
         }
 
+        public void Remove(ICollide actor)
+        {
+            group.Remove(actor);
+        }
+
         public void Collide()
         {
             for (int i = 0; i < group.Count; i++)

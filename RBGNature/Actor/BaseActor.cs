@@ -19,5 +19,7 @@ namespace RBGNature.Actor
         {
             return y * 0.0000001f;
         }
+
+        public virtual bool Dead() { return false; }
     }
 }

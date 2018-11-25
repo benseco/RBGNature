@@ -24,7 +24,7 @@ namespace RBGNature.Graphics.Animate
             Frame = 0;
         }
 
-        public Rectangle NextFrame(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             ElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
@@ -34,7 +34,10 @@ namespace RBGNature.Graphics.Animate
                 if (Frame > Animation.Sheet.Length - 1) Frame = 0;
                 ElapsedTime -= Animation.FrameTime;
             }
+        }
 
+        public Rectangle NextFrame()
+        {
             return Animation.Sheet[Frame];
         }
     }

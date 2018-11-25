@@ -16,8 +16,12 @@ namespace RBGNature.Actor.Enemy
         Texture2D textureFront;
         Texture2D textureCircle10;
         Texture2D textureBullet;
+        Texture2D textureHPBar;
         Player player;
         List<Circle> bullets;
+        public int CurrentHealth { get; private set; }
+        const int MaxHealth = 10;
+        bool tookDamage = false;
 
         public TestEnemy(Vector2 position, Player player)
         {
@@ -30,13 +34,18 @@ namespace RBGNature.Actor.Enemy
             };
             this.player = player;
             bullets = new List<Circle>();
+            CurrentHealth = MaxHealth;
         }
 
         public void Collide(PhysicsGroupType groupType, ICollide other)
         {
             if (groupType == PhysicsGroupType.Physical)
             {
-                other.Collide(groupType, collision, null);
+                CollisionResult result = other.Collide(groupType, collision, null);
+                if (result)
+                {
+                    takeDamage(result.Identity);
+                }
             }
         }
 
@@ -44,20 +53,35 @@ namespace RBGNature.Actor.Enemy
         {
             if (groupType == PhysicsGroupType.Physical)
             {
-                return physicsObject.Collide(collision).Switch();
+                CollisionResult result = physicsObject.Collide(collision).Switch();
+                if (result)
+                {
+                    takeDamage(identity);
+                    return result;
+                }
             }
             return CollisionResult.None;
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(textureFront, collision.Position - new Vector2(10, 30), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
+            if (Dead())
+            {
+                return;
+            }
+            Color tint = Color.White;
+            if (tookDamage)
+            {
+                tint = Color.Red;
+            }
+            spriteBatch.Draw(textureFront, collision.Position - new Vector2(10, 30), null, tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
             spriteBatch.Draw(textureCircle10, collision.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
             foreach (Circle bullet in bullets)
             {
                 spriteBatch.Draw(textureBullet, bullet.Position, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
             }
+            spriteBatch.Draw(textureHPBar, collision.Position - new Vector2(0, 50), getHealthSpriteRect(), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
         }
 
         public override void LoadContent(ContentManager contentManager)
@@ -65,10 +89,35 @@ namespace RBGNature.Actor.Enemy
             textureFront = contentManager.Load<Texture2D>("Sprites/enemy/square flower - corrupt");
             textureBullet = contentManager.Load<Texture2D>("Sprites/enemy/effect/square flower - corrupt bullet");
             textureCircle10 = contentManager.Load<Texture2D>("Sprites/debug/circle10");
+            textureHPBar = contentManager.Load<Texture2D>("UI/HPBar");
+        }
+
+        public override bool Dead()
+        {
+            return CurrentHealth <= 0;
+        }
+
+        private Rectangle getHealthSpriteRect()
+        {
+            int index = 8 - (int) Math.Ceiling(((float) CurrentHealth / MaxHealth * 8));
+            return new Rectangle(0, index*8, 8, 8);
+        }
+
+        private void takeDamage(CollisionIdentity identity)
+        {
+            if (identity == null)
+                return;
+            if (identity.Damage > 0)
+            {
+                CurrentHealth -= identity.Damage;
+                tookDamage = true;
+                timeBetweenDamage = 0;
+            }
         }
 
         int timeBetweenShots = 0;
         Vector2 headOffset = new Vector2(0, -25);
+        int timeBetweenDamage = 0;
 
         public override void Update(GameTime gameTime)
         {
@@ -95,7 +144,15 @@ namespace RBGNature.Actor.Enemy
                 });
             }
 
-
+            if (tookDamage)
+            {
+                timeBetweenDamage += ellapsedTime;
+            }
+            if (timeBetweenDamage > 100)
+            {
+                timeBetweenDamage = 0;
+                tookDamage = false;
+            }
 
         }
     }

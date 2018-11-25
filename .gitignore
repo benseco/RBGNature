@@ -1,5 +1,7 @@
 /RBGNature/obj/*
 /RBGNature/bin/*
+/RBGNature/Content/obj/*
+/RBGNature/Content/bin/*
 /RBGNatureTest/obj/*
 /RBGNatureTest/bin/*
 /.vs/*

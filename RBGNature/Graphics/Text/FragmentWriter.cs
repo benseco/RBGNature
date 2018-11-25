@@ -26,16 +26,14 @@ namespace RBGNature.Graphics.Text
 
         private string FontKey { get; set; }
         private int Index { get; set; }
-        private Vector2 Position { get; set; }
         private Vector2 Space { get; set; }
-        private Vector2 Origin { get; set; }
+        public Vector2 Origin { get; set; }
 
         public FragmentWriter(string fontKey, string source, Rectangle textArea, Color color, int speed = 100)
         {
             FontKey = fontKey;
             TextArea = textArea;
             Origin = textArea.Location.ToVector2();
-            Position = Origin;
             Color = color;
             Speed = speed;
             Index = 0;
@@ -89,10 +87,8 @@ namespace RBGNature.Graphics.Text
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
-            Position = Origin;
-
             // Calculate new Index
             Fragment currentFragment = Fragments[Index];
             bool fragmentDone = !currentFragment.UpdateIndex(gameTime.ElapsedGameTime.Milliseconds, Speed);
@@ -100,6 +96,11 @@ namespace RBGNature.Graphics.Text
             {
                 Index++;
             }
+        }
+
+        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            Vector2 position = Origin;
 
             // Actually do the Draw
             for (int i = 0; i <= Index; i++)
@@ -107,13 +108,13 @@ namespace RBGNature.Graphics.Text
                 Fragment fragment = Fragments[i];
 
                 Vector2 fragmentLength = Font.MeasureString(fragment.Text);
-                if (Position.X + fragmentLength.X - Origin.X > TextArea.Width)
+                if (position.X + fragmentLength.X - Origin.X > TextArea.Width)
                 {
-                    Position = new Vector2(Origin.X, Position.Y + Font.LineSpacing);
+                    position = new Vector2(Origin.X, position.Y + Font.LineSpacing);
                 }
 
-                Position = fragment.Draw(spriteBatch, Font, Position, Color);
-                Position += new Vector2(Space.X, 0);
+                position = fragment.Draw(spriteBatch, Font, position, Color);
+                position += new Vector2(Space.X, 0);
             }
 
         }
