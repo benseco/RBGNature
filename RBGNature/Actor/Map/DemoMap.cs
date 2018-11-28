@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 using RBGNature.Physics;
 using System;
 using System.Collections.Generic;
@@ -91,6 +92,8 @@ namespace RBGNature.Actor.Map
         TriArray collision;
 
         Texture2D[] textureTri;
+
+        Song songBeach;
         
         public DemoMap()
         {
@@ -108,6 +111,10 @@ namespace RBGNature.Actor.Map
             textureTri[1] = contentManager.Load<Texture2D>("Sprites/debug/trileft");
             textureTri[2] = contentManager.Load<Texture2D>("Sprites/debug/tribottom");
             textureTri[3] = contentManager.Load<Texture2D>("Sprites/debug/triright");
+
+            songBeach = contentManager.Load<Song>("Sound/ambient/beach");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(songBeach);
         }
 
         public override void Update(GameTime gameTime)

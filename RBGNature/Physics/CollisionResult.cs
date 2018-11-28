@@ -36,10 +36,11 @@ namespace RBGNature.Physics
 
         public CollisionResult Switch()
         {
+            if (!collides) return this;
+
             CollisionResult result = new CollisionResult(PositionB, VelocityB, PositionA, VelocityA);
-            result.Identity = this.Identity;
-            if (collides) return result;
-            else return this;
+            result.Identity = Identity;
+            return result;
         }
         
         public static implicit operator bool(CollisionResult d)

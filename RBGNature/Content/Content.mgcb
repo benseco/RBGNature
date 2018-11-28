@@ -344,3 +344,15 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/bullet/cannonball.png
 
+#begin Sound/effect/gunshot.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/effect/gunshot.wav
+
+#begin Sound/ambient/beach.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/ambient/beach.wav
+

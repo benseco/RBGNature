@@ -1,15 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using RBGNature.Graphics;
 using RBGNature.Graphics.Animate;
 using RBGNature.Physics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RBGNature.Actor
 {
@@ -41,6 +38,8 @@ namespace RBGNature.Actor
         Texture2D textureBullet;
         Texture2D textureCannonball;
         Texture2D textureHPBar;
+        SoundEffect soundEffectGunshot;
+
         public int CurrentHealth { get; private set; }
         const int MaxHealth = 15;
         bool tookDamage = false;
@@ -50,6 +49,8 @@ namespace RBGNature.Actor
         List<Circle> bullets;
         List<Circle> cannonballs;
         public Circle collision;
+        private CollisionResult collisionResult;
+        private bool nextCollisionSet;
 
         Texture2D textureCircle10;
         Texture2D textureCircle200;
@@ -87,6 +88,7 @@ namespace RBGNature.Actor
                 Position = new Vector2(camera.Position.X, camera.Position.Y),
                 Mass = 1
             };
+            collisionResult = CollisionResult.None;
             CurrentHealth = MaxHealth;
             animator = new Animator(animDict_Run[RunAnimation.Front]);
         }
@@ -101,11 +103,24 @@ namespace RBGNature.Actor
             textureCircle10 = contentManager.Load<Texture2D>("Sprites/debug/circle10");
             textureCircle200 = contentManager.Load<Texture2D>("Sprites/debug/circle200");
             textureHPBar = contentManager.Load<Texture2D>("UI/HPBar");
+
+            soundEffectGunshot = contentManager.Load<SoundEffect>("Sound/effect/gunshot");
         }
 
         public override void Update(GameTime gameTime)
         {
-            collision.Position += collision.Velocity;
+            if (collisionResult)
+            {
+                // If we had a collision, start over with the collision result
+                collision.Position = collisionResult.PositionA;
+                collision.Velocity = collisionResult.VelocityA;
+                collisionResult = CollisionResult.None;
+            }
+            else
+            {
+                collision.Position += collision.Velocity;
+            }
+
             camera.MoveTo(collision.Position);
 
             float speed = .15f;
@@ -138,6 +153,7 @@ namespace RBGNature.Actor
                 inputVelocity.X += distance;
             }
             collision.Velocity = collision.Velocity * 0.7f + inputVelocity * 0.3f;
+
 
 
             if (kstate.IsKeyDown(Keys.F))
@@ -177,6 +193,8 @@ namespace RBGNature.Actor
                         Radius = 6
                     });
                 }
+
+                soundEffectGunshot.CreateInstance().Play();
             }
 
             foreach (Circle bullet in bullets)
@@ -281,8 +299,16 @@ namespace RBGNature.Actor
                 CollisionResult playerCollision = other.Collide(groupType, this.collision, null);
                 if (playerCollision)
                 {
-                    collision.Position = playerCollision.PositionA;
-                    collision.Velocity = playerCollision.VelocityA - collision.Velocity;
+                    if (collisionResult)
+                    {
+                        //Not sure if necessary, but if we have multiple collisions in a single frame, stop all movement.
+                        collisionResult.PositionA = collision.Position;
+                        collisionResult.VelocityA = Vector2.Zero;
+                    }
+                    else
+                    {
+                        collisionResult = playerCollision;
+                    }
                     TakeDamage(playerCollision.Identity);
                 }
             }
@@ -323,8 +349,16 @@ namespace RBGNature.Actor
                 CollisionResult playerCollision = physicsObject.Collide(collision);
                 if (playerCollision)
                 {
-                    collision.Position = playerCollision.PositionB;
-                    collision.Velocity = playerCollision.VelocityB - collision.Velocity;
+                    if (collisionResult)
+                    {
+                        //Not sure if necessary, but if we have multiple collisions in a single frame, stop all movement.
+                        collisionResult.PositionA = collision.Position;
+                        collisionResult.VelocityA = Vector2.Zero;
+                    }
+                    else
+                    {
+                        collisionResult = playerCollision.Switch();
+                    }
                     response = playerCollision;
                     TakeDamage(identity);
                 }
