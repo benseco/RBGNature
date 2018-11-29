@@ -38,5 +38,10 @@ namespace RBGNature.Actor.Map
             //spriteBatch.Draw(textureMap1, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, .9f);
             //spriteBatch.Draw(textureMap2, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
         }
+
+        public override bool Dead()
+        {
+            return false;
+        }
     }
 }

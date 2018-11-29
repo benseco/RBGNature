@@ -10,7 +10,7 @@ using RBGNature.Physics;
 
 namespace RBGNature.Actor.Enemy
 {
-    class WalkingEnemy : BaseActor, ICollide
+    class WalkingEnemy : IAct, ICollide
     {
         Circle collision;
         Texture2D textureFront;
@@ -99,7 +99,7 @@ namespace RBGNature.Actor.Enemy
             return response;
         }
 
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             if (Dead())
             {
@@ -110,17 +110,17 @@ namespace RBGNature.Actor.Enemy
             {
                 tint = Color.Red;
             }
-            spriteBatch.Draw(textureFront, collision.Position - new Vector2(10, 30), null, tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
+            spriteBatch.Draw(textureFront, collision.Position - new Vector2(10, 30), null, tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
             spriteBatch.Draw(textureCircle10, collision.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
             foreach (Circle bullet in bullets)
             {
                 spriteBatch.Draw(textureBullet, bullet.Position, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
             }
-            spriteBatch.Draw(textureHPBar, collision.Position - new Vector2(0, 50), getHealthSpriteRect(), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
+            spriteBatch.Draw(textureHPBar, collision.Position - new Vector2(0, 50), getHealthSpriteRect(), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
         }
 
-        public override void LoadContent(ContentManager contentManager)
+        public void LoadContent(ContentManager contentManager)
         {
             textureFront = contentManager.Load<Texture2D>("Sprites/enemy/square flower - corrupt");
             textureBullet = contentManager.Load<Texture2D>("Sprites/enemy/effect/square flower - corrupt bullet");
@@ -128,7 +128,7 @@ namespace RBGNature.Actor.Enemy
             textureHPBar = contentManager.Load<Texture2D>("UI/HPBar");
         }
 
-        public override bool Dead()
+        public bool Dead()
         {
             return CurrentHealth <= 0;
         }
@@ -155,7 +155,7 @@ namespace RBGNature.Actor.Enemy
         Vector2 headOffset = new Vector2(0, -25);
         int timeBetweenDamage = 0;
 
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             collision.Position += collision.Velocity;
             collision.Velocity = new Vector2(random.Next(-2, 3), random.Next(-2, 3)) * 0.05f + collision.Velocity * 0.92f + Vector2.Normalize((player.collision.Position - collision.Position)) * 0.03f;

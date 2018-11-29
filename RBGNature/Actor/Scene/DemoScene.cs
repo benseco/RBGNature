@@ -55,6 +55,11 @@ namespace RBGNature.Actor.Scene
             writer = new FragmentWriter("Fonts/TooMuchInk", example, new Rectangle(100, 450, 200, 200), Color.White);
         }
 
+        public override bool Dead()
+        {
+            return false;
+        }
+
         public override void DrawParent(GameTime gameTime, SpriteBatch spriteBatch)
         {
             writer.Draw(spriteBatch, gameTime);

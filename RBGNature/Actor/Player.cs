@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace RBGNature.Actor
 {
-    class Player : BaseActor, ICollide
+    class Player : IAct, ICollide
     {
         enum RunAnimation
         {
@@ -47,10 +47,11 @@ namespace RBGNature.Actor
         Animator animator;
 
         List<Circle> bullets;
+        List<Circle> bulletsToRemove;
         List<Circle> cannonballs;
+        List<Circle> cannonballsToRemove;
         public Circle collision;
         private CollisionResult collisionResult;
-        private bool nextCollisionSet;
 
         Texture2D textureCircle10;
         Texture2D textureCircle200;
@@ -80,8 +81,10 @@ namespace RBGNature.Actor
         public Player(Camera camera)
         {
             this.camera = camera;
-            this.bullets = new List<Circle>();
-            this.cannonballs = new List<Circle>();
+            bullets = new List<Circle>();
+            bulletsToRemove = new List<Circle>();
+            cannonballs = new List<Circle>();
+            cannonballsToRemove = new List<Circle>();
             collision = new Circle()
             {
                 Radius = 10,
@@ -93,7 +96,7 @@ namespace RBGNature.Actor
             animator = new Animator(animDict_Run[RunAnimation.Front]);
         }
 
-        public override void LoadContent(ContentManager contentManager)
+        public void LoadContent(ContentManager contentManager)
         {
             animDict_Run.Load(contentManager);
 
@@ -107,7 +110,7 @@ namespace RBGNature.Actor
             soundEffectGunshot = contentManager.Load<SoundEffect>("Sound/effect/gunshot");
         }
 
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             if (collisionResult)
             {
@@ -167,6 +170,9 @@ namespace RBGNature.Actor
             }
             else { canChangeMode = true; }
 
+            //Remove any bullets that collided in the last update
+            bulletsToRemove.ForEach(b => bullets.Remove(b));
+            cannonballsToRemove.ForEach(b => cannonballsToRemove.Remove(b));
 
             var mstate = Mouse.GetState();
             timeBetweenShots += ellapsedTime;
@@ -218,14 +224,14 @@ namespace RBGNature.Actor
             }
         }
 
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             Color tint = Color.White;
             if (tookDamage)
             {
                 tint = Color.Red;
             }
-            spriteBatch.Draw(animator.Animation.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(), tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, LayerDepth(collision.Position.Y));
+            spriteBatch.Draw(animator.Animation.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(), tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
 
             spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
@@ -278,9 +284,9 @@ namespace RBGNature.Actor
                     CollisionResult bulletCollision = other.Collide(groupType, bullet, bulletIdentity);
                     if (bulletCollision)
                     {
-                        bullets.RemoveAt(i);
-                        //bullet.Position = bulletCollision.PositionB;
-                        //bullet.Velocity = bulletCollision.VelocityB;
+                        bulletsToRemove.Add(bullet);
+                        bullet.Position = bulletCollision.PositionA;
+                        //bullet.Velocity = bulletCollision.VelocityA;
                     }
 
                 }
@@ -290,9 +296,9 @@ namespace RBGNature.Actor
                     CollisionResult cannonballCollision = other.Collide(groupType, cannonball, cannonballIdentity);
                     if (cannonballCollision)
                     {
-                        cannonballs.RemoveAt(i);
-                        //bullet.Position = bulletCollision.PositionB;
-                        //bullet.Velocity = bulletCollision.VelocityB;
+                        cannonballsToRemove.Add(cannonball);
+                        cannonball.Position = cannonballCollision.PositionA;
+                        //bullet.Velocity = bulletCollision.VelocityA;
                     }
 
                 }
@@ -325,8 +331,8 @@ namespace RBGNature.Actor
                     CollisionResult bulletCollision = physicsObject.Collide(bullet);
                     if (bulletCollision)
                     {
-                        bullets.RemoveAt(i);
-                        //bullet.Position = bulletCollision.PositionB;
+                        bulletsToRemove.Add(bullet);
+                        bullet.Position = bulletCollision.PositionB;
                         //bullet.Velocity = bulletCollision.VelocityB;
                         bulletCollision.Identity = bulletIdentity;
                         response = bulletCollision;
@@ -338,8 +344,8 @@ namespace RBGNature.Actor
                     CollisionResult cannonballCollision = physicsObject.Collide(cannonball);
                     if (cannonballCollision)
                     {
-                        cannonballs.RemoveAt(i);
-                        //bullet.Position = bulletCollision.PositionB;
+                        cannonballsToRemove.Add(cannonball);
+                        cannonball.Position = cannonballCollision.PositionB;
                         //bullet.Velocity = bulletCollision.VelocityB;
                         cannonballCollision.Identity = cannonballIdentity;
                         response = cannonballCollision;
@@ -364,6 +370,11 @@ namespace RBGNature.Actor
                 }
             }
             return response;
+        }
+
+        public bool Dead()
+        {
+            return false;
         }
     }
 }

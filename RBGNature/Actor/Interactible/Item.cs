@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace RBGNature.Actor.Interactible
 {
-    class Item : BaseActor
+    class Item : IAct
     {
         private Player Player { get; set; }
         private Vector2 Position { get; set; }
@@ -26,7 +26,7 @@ namespace RBGNature.Actor.Interactible
             Position = position;
         }
 
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(TextureItem, Position - new Vector2(6,6), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
             if (ShowInteractIcon)
@@ -35,13 +35,13 @@ namespace RBGNature.Actor.Interactible
             }
         }
 
-        public override void LoadContent(ContentManager contentManager)
+        public void LoadContent(ContentManager contentManager)
         {
             TextureInteractIcon = contentManager.Load<Texture2D>("UI/interactButton");
             TextureItem = contentManager.Load<Texture2D>("Sprites/item/maxRevive");
         }
 
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             if (Vector2.DistanceSquared(Player.collision.Position, Position) < 800)
             {
@@ -61,7 +61,7 @@ namespace RBGNature.Actor.Interactible
             
         }
 
-        public override bool Dead()
+        public bool Dead()
         {
             return Taken;
         }

@@ -10,8 +10,11 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Actor.Map
 {
-    abstract class BaseMap : BaseActor
+    abstract class BaseMap : IAct
     {
-
+        public abstract bool Dead();
+        public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
+        public abstract void LoadContent(ContentManager contentManager);
+        public abstract void Update(GameTime gameTime);
     }
 }

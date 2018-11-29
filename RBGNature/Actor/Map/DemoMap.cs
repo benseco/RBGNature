@@ -148,5 +148,10 @@ namespace RBGNature.Actor.Map
         {
             return physicsObject.Collide(collision);
         }
+
+        public override bool Dead()
+        {
+            return false;
+        }
     }
 }
