@@ -10,29 +10,38 @@ namespace RBGNature.Graphics.Animate
 {
     public class Animator
     {
-        public Animation Animation { get; private set; }
+        private Animation Animation { get; set; }
         private int Frame { get; set; }
         private int ElapsedTime { get; set; }
+        private Animation SetAnimation { get; set; }
 
-        public Animator(Animation animation) => Animate(animation);
+        public Texture2D Texture { get { return Animation.Texture; } }
 
-        public void Animate(Animation animation)
+        public Animator(Animation animation) => Set(animation);
+
+        public void Set(Animation animation)
         {
-            if (Animation == animation) return;
-            Animation = animation;
-            ElapsedTime = 0;
-            Frame = 0;
+            SetAnimation = animation;
         }
 
         public void Update(GameTime gameTime)
         {
-            ElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
-
-            while (ElapsedTime > Animation.FrameTime)
+            if (Animation != SetAnimation)
             {
-                Frame++;
-                if (Frame > Animation.Sheet.Length - 1) Frame = 0;
-                ElapsedTime -= Animation.FrameTime;
+                Animation = SetAnimation;
+                ElapsedTime = 0;
+                Frame = 0;
+            }
+            else
+            {
+                ElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
+
+                while (ElapsedTime > Animation.FrameTime)
+                {
+                    Frame++;
+                    if (Frame > Animation.Sheet.Length - 1) Frame = 0;
+                    ElapsedTime -= Animation.FrameTime;
+                }
             }
         }
 

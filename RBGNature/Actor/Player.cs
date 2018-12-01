@@ -15,7 +15,9 @@ namespace RBGNature.Actor
         enum RunAnimation
         {
             Front,
-            Back
+            Back,
+            Left,
+            Right
         }
         
         static readonly Rectangle RectBulletDefault = new Rectangle(0, 0, 6, 6);
@@ -76,6 +78,8 @@ namespace RBGNature.Actor
             animDict_Run = new AnimationDictionary<RunAnimation>();
             animDict_Run[RunAnimation.Front] = new Animation("Sprites/mc/mc_run_front", 100, 8, 14, 38);
             animDict_Run[RunAnimation.Back] = new Animation("Sprites/mc/mc_run_back", 100, 8, 14, 38);
+            animDict_Run[RunAnimation.Left] = new Animation("Sprites/mc/mc_run_left", 100, 8, 20, 36);
+            animDict_Run[RunAnimation.Right] = new Animation("Sprites/mc/mc_run_right", 100, 8, 20, 36);
         }
 
         public Player(Camera camera)
@@ -137,23 +141,25 @@ namespace RBGNature.Actor
             if (kstate.IsKeyDown(Keys.W))
             {
                 inputVelocity.Y -= distance;
-                animator.Animate(animDict_Run[RunAnimation.Back]);
+                animator.Set(animDict_Run[RunAnimation.Back]);
             }
 
             if (kstate.IsKeyDown(Keys.S))
             {
                 inputVelocity.Y += distance;
-                animator.Animate(animDict_Run[RunAnimation.Front]);
+                animator.Set(animDict_Run[RunAnimation.Front]);
             }
 
             if (kstate.IsKeyDown(Keys.A))
             {
                 inputVelocity.X -= distance;
+                animator.Set(animDict_Run[RunAnimation.Left]);
             }
 
             if (kstate.IsKeyDown(Keys.D))
             {
                 inputVelocity.X += distance;
+                animator.Set(animDict_Run[RunAnimation.Right]);
             }
             collision.Velocity = collision.Velocity * 0.7f + inputVelocity * 0.3f;
 
@@ -172,7 +178,7 @@ namespace RBGNature.Actor
 
             //Remove any bullets that collided in the last update
             bulletsToRemove.ForEach(b => bullets.Remove(b));
-            cannonballsToRemove.ForEach(b => cannonballsToRemove.Remove(b));
+            cannonballsToRemove.ForEach(b => cannonballs.Remove(b));
 
             var mstate = Mouse.GetState();
             timeBetweenShots += ellapsedTime;
@@ -231,7 +237,7 @@ namespace RBGNature.Actor
             {
                 tint = Color.Red;
             }
-            spriteBatch.Draw(animator.Animation.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(), tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
+            spriteBatch.Draw(animator.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(), tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
 
             spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
