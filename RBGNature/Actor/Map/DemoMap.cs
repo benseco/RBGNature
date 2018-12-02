@@ -114,7 +114,7 @@ namespace RBGNature.Actor.Map
 
             songBeach = contentManager.Load<Song>("Sound/ambient/beach");
             MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(songBeach);
+            //MediaPlayer.Play(songBeach);
         }
 
         public override void Update(GameTime gameTime)

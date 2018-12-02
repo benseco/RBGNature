@@ -41,6 +41,7 @@ namespace RBGNature.Actor
         Texture2D textureCannonball;
         Texture2D textureHPBar;
         SoundEffect soundEffectGunshot;
+        SoundEffect soundEffectRhythmClick;
 
         public int CurrentHealth { get; private set; }
         const int MaxHealth = 15;
@@ -62,6 +63,11 @@ namespace RBGNature.Actor
         private bool canChangeMode;
 
         private int timeBetweenShots;
+        private bool justShot;
+
+        private int shotRhythm;
+        private bool countingRhythm;
+        private bool rhythmReady;
 
         public enum GunMode
         {
@@ -112,6 +118,7 @@ namespace RBGNature.Actor
             textureHPBar = contentManager.Load<Texture2D>("UI/HPBar");
 
             soundEffectGunshot = contentManager.Load<SoundEffect>("Sound/effect/gunshot");
+            soundEffectRhythmClick = contentManager.Load<SoundEffect>("Sound/effect/metronome");
         }
 
         public void Update(GameTime gameTime)
@@ -182,31 +189,68 @@ namespace RBGNature.Actor
 
             var mstate = Mouse.GetState();
             timeBetweenShots += ellapsedTime;
-            if (mstate.LeftButton == ButtonState.Pressed && timeBetweenShots > 100)
+            if (mstate.LeftButton == ButtonState.Pressed)
             {
-                timeBetweenShots = 0;
-                if (mode == GunMode.Default)
+                if (timeBetweenShots > 100 && !justShot)
                 {
-                    bullets.Add(new Circle()
+                    if (mode == GunMode.Default)
                     {
-                        Position = camera.Position,
-                        Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 4,
-                        Mass = 1,
-                        Radius = 3
-                    });
-                }
-                else if (mode == GunMode.Cannon)
-                {
-                    cannonballs.Add(new Circle()
+                        bullets.Add(new Circle()
+                        {
+                            Position = camera.Position,
+                            Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 4,
+                            Mass = 1,
+                            Radius = 3
+                        });
+                    }
+                    else if (mode == GunMode.Cannon)
                     {
-                        Position = camera.Position,
-                        Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 2,
-                        Mass = 1,
-                        Radius = 6
-                    });
-                }
+                        cannonballs.Add(new Circle()
+                        {
+                            Position = camera.Position,
+                            Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 2,
+                            Mass = 1,
+                            Radius = 6
+                        });
+                    }
 
-                soundEffectGunshot.CreateInstance().Play();
+                    soundEffectGunshot.CreateInstance().Play();
+
+                    if (countingRhythm)
+                    {
+                        if (shotRhythm == 0)
+                        {
+                            shotRhythm = timeBetweenShots;
+                        }
+                        else if (Math.Abs(timeBetweenShots - shotRhythm) < 60)
+                        {
+                            rhythmReady = true;
+                        }
+                        else
+                        {
+                            rhythmReady = false;
+                            countingRhythm = false;
+                        }
+                    }
+                    else
+                    {
+                        countingRhythm = true;
+                        shotRhythm = 0;
+                    }
+
+                    timeBetweenShots = 0;
+                    justShot = true;
+                }
+            }
+            else
+            {
+                justShot = false;
+            }
+
+            if (rhythmReady && timeBetweenShots >= .5 * shotRhythm && rhythmReady)
+            {
+                soundEffectRhythmClick.CreateInstance().Play();
+                rhythmReady = false;
             }
 
             foreach (Circle bullet in bullets)

@@ -380,3 +380,21 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/mc/mc_run_back.png
 
+#begin Sound/effect/click.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/effect/click.wav
+
+#begin Sound/effect/reload.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/effect/reload.wav
+
+#begin Sound/effect/metronome.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/effect/metronome.wav
+
