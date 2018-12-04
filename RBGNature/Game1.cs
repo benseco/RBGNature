@@ -15,7 +15,10 @@ namespace RBGNature
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         RenderTarget2D renderTarget;
+        RenderTarget2D lightTarget;
         BaseScene scene;
+
+        Texture2D light;
 
         private static bool Paused { get; set; }
         private static bool JustPaused { get; set; }
@@ -33,6 +36,22 @@ namespace RBGNature
             {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}}
         };
 
+        private static BlendState Multiply = new BlendState()
+        {
+            AlphaSourceBlend = Blend.DestinationAlpha,
+            AlphaDestinationBlend = Blend.Zero,
+            AlphaBlendFunction = BlendFunction.Add,
+            ColorSourceBlend = Blend.DestinationColor,
+            ColorDestinationBlend = Blend.Zero,
+            ColorBlendFunction = BlendFunction.Add
+        };
+
+        private static BlendState Lighten = new BlendState()
+        {
+            ColorSourceBlend = Blend.One,
+            ColorDestinationBlend = Blend.One,
+            ColorBlendFunction = BlendFunction.Max
+        };
 
         public Game1()
         {
@@ -68,6 +87,8 @@ namespace RBGNature
             renderTarget = new RenderTarget2D(graphics.GraphicsDevice, 640, 360, false, SurfaceFormat.Color,
                 DepthFormat.None, presentationParameters.MultiSampleCount, RenderTargetUsage.DiscardContents);
 
+            lightTarget = new RenderTarget2D(graphics.GraphicsDevice, 640, 360, false, SurfaceFormat.Color,
+                DepthFormat.None, presentationParameters.MultiSampleCount, RenderTargetUsage.DiscardContents);
 
             scene = new DemoScene();
 
@@ -88,6 +109,8 @@ namespace RBGNature
 
             // TODO: use this.Content to load your game content here
             scene.LoadContent(Content);
+
+            light = Content.Load<Texture2D>("Sprites/light/53");
         }
 
         /// <summary>
@@ -142,19 +165,62 @@ namespace RBGNature
 
             // TODO: Add your drawing code here
 
+            Color color = Color.Black;
+            float lengthOfDay = 12000;
+            float timeOfDay = (float)gameTime.TotalGameTime.TotalMilliseconds % lengthOfDay / lengthOfDay;
+            if (timeOfDay < .25)
+            {
+                color = Color.MidnightBlue;
+            }
+            else if (timeOfDay < .375)
+            {
+                color = Color.Lerp(Color.MidnightBlue, Color.LightSkyBlue, (timeOfDay - .25f) / .125f);
+            }
+            else if (timeOfDay < .5)
+            {
+                color = Color.Lerp(Color.LightSkyBlue, Color.White, (timeOfDay - .375f) / .125f);
+            }
+            else if (timeOfDay < .75)
+            {
+                color = Color.White;
+            }
+            else if (timeOfDay < .875)
+            {
+                color = Color.Lerp(Color.White, Color.Chocolate, (timeOfDay - .75f) / .125f);
+            }
+            else
+            {
+                color = Color.Lerp(Color.Chocolate, Color.MidnightBlue, (timeOfDay - .875f) / .125f);
+            }
+
+            //lights target
+            GraphicsDevice.SetRenderTarget(lightTarget);
+            GraphicsDevice.Clear(color);
+
+
+            spriteBatch.Begin(blendState: Lighten, transformMatrix: scene.Camera.GetTransform());
+            //spriteBatch.Draw(light,position: scene.Camera.Position - new Vector2(31,40), scale: 4*Vector2.One, color: new Color(0,255,0));
+            spriteBatch.Draw(light, scene.Camera.Position - new Vector2(105, 120), null, new Color(0,255,0), 0, Vector2.Zero, Vector2.One*4, SpriteEffects.None, 1);
+            spriteBatch.End();
+
+
+            //game
             GraphicsDevice.SetRenderTarget(renderTarget);
             GraphicsDevice.Clear(Color.Transparent);
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-            //spriteBatch.Begin(samplerState:SamplerState.PointClamp, transformMatrix:camera.GetTransform());
-            //spriteBatch.Draw(textureMap, new Vector2(0, 0), Color.White);
-            //spriteBatch.Draw(textureMan, camera.Position, Color.White);
-            //spriteBatch.End();
 
             spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: scene.Camera.GetTransform(), sortMode: SpriteSortMode.FrontToBack);
             scene.Draw(gameTime, spriteBatch);
+            spriteBatch.End();
+            
+
+
+            //apply lights target
+            spriteBatch.Begin(blendState: Multiply);
+            spriteBatch.Draw(lightTarget, new Rectangle(0,0,640,360), Color.White);
             spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(null);

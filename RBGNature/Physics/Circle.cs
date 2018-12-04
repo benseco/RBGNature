@@ -57,9 +57,9 @@ namespace RBGNature.Physics
                 Vector2 newV = Velocity - (1 / Mass) * magnitude * n;
                 Vector2 cNewV = c.Velocity + (1 / c.Mass) * magnitude * n;
 
-                // Add some separation (.1f is arbitrary ?)
-                newPos = newPos + newV * .1f;
-                cNewPos = cNewPos + cNewV * .1f;
+                // Add some separation (.01f is arbitrary ?)
+                newPos = newPos + newV * .01f;
+                cNewPos = cNewPos + cNewV * .01f;
 
                 return new CollisionResult(newPos, newV, cNewPos, cNewV);
             }
