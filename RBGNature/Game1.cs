@@ -55,6 +55,8 @@ namespace RBGNature
 
         public Game1()
         {
+            IsFixedTimeStep = false;
+            //TargetElapsedTime = System.TimeSpan.FromSeconds(1.0f / 240.0f);
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -80,6 +82,7 @@ namespace RBGNature
             graphics.IsFullScreen = false;
             graphics.PreferredBackBufferWidth = 2560;
             graphics.PreferredBackBufferHeight = 1440;
+            //graphics.SynchronizeWithVerticalRetrace = false;
             graphics.ApplyChanges();
 
             // set up render target
@@ -145,8 +148,11 @@ namespace RBGNature
             scene.Update(gameTime);
 
             base.Update(gameTime);
+
+            updateCount++;
         }
 
+        int updateCount = 0;
         double previousFrameTime;
 
         /// <summary>
@@ -156,9 +162,13 @@ namespace RBGNature
         protected override void Draw(GameTime gameTime)
         {
             double currentFrameTime = gameTime.ElapsedGameTime.TotalSeconds;
+
+            //System.Console.WriteLine("FPS:" + 1 / currentFrameTime + " | " + updateCount);
+            updateCount = 0;
+
             if (currentFrameTime > previousFrameTime)
             {
-                System.Console.WriteLine("Frame took too long: " + gameTime.ElapsedGameTime.TotalSeconds + "s");
+                //System.Console.WriteLine("Frame took too long: " + gameTime.ElapsedGameTime.TotalSeconds + "s");
             }
             previousFrameTime = currentFrameTime;
 

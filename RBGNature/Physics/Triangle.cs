@@ -43,13 +43,13 @@ namespace RBGNature.Physics
             return s > 0 && t > 0 && (s + t) < 2 * A * sign;
         }
 
-        public CollisionResult CollideCircleAtTime(Circle circle, out double t)
+        public CollisionResult CollideCircleAtTime(float s, Circle circle, out double t)
         {
             t = -1;
 
-            CollisionResult rAB = CollideCircleWithEdgeAtTime(circle, A, B, out double tAB);
-            CollisionResult rBC = CollideCircleWithEdgeAtTime(circle, B, C, out double tBC);
-            CollisionResult rCA = CollideCircleWithEdgeAtTime(circle, C, A, out double tCA);
+            CollisionResult rAB = CollideCircleWithEdgeAtTime(s, circle, A, B, out double tAB);
+            CollisionResult rBC = CollideCircleWithEdgeAtTime(s, circle, B, C, out double tBC);
+            CollisionResult rCA = CollideCircleWithEdgeAtTime(s, circle, C, A, out double tCA);
 
             CollisionResult earliestCollision = CollisionResult.None;
             double earliestTime = 2d; //arbitrary
@@ -111,14 +111,14 @@ namespace RBGNature.Physics
             return CollisionResult.None;
         }*/
 
-        public CollisionResult CollideCircleWithEdgeAtTime(Circle circle, Vector2 I, Vector2 J, out double t)
+        public CollisionResult CollideCircleWithEdgeAtTime(float s, Circle circle, Vector2 I, Vector2 J, out double t)
         {
             t = -1; //arbitrary error case
 
             // Circle moves along path MN
             Vector2 M = circle.Position;
-            Vector2 N = circle.Position + circle.Velocity;
-            Vector2 MN = circle.Velocity;
+            Vector2 N = circle.Position + circle.Velocity * s;
+            Vector2 MN = N - M;
 
             // Collide with IJ translated by the normal of the circle's radius in length
             Vector2 IJ = J - I;
@@ -137,7 +137,7 @@ namespace RBGNature.Physics
             Circle point = new Circle() { Position = circle.Position, Velocity = circle.Velocity };
             Circle corner = new Circle() { Position = I, Radius = circle.Radius };
             double timeOfCornerIntersection = -1;
-            CollisionResult cornerCollisionResult = point.CollideCircleAtTime(corner, out timeOfCornerIntersection);
+            CollisionResult cornerCollisionResult = point.CollideCircleAtTime(s, corner, out timeOfCornerIntersection);
 
             // Earliest wins
             CircleEdgeCollision first = FirstCircleEdgeCollision(timeOfEdgeIntersection, timeOfCornerIntersection);
@@ -148,15 +148,15 @@ namespace RBGNature.Physics
             if (first == CircleEdgeCollision.Edge)
             {
                 t = timeOfEdgeIntersection;
-                Vector2 newCirclePos = M + (float)t * MN - 0.5f * normMN; //Separation of .5 unit
-                Vector2 newCircleVel = (2 * Vector2.Dot(normIJ, negNormMN) * normIJ - negNormMN) * MN.Length();
+                Vector2 newCirclePos = M + (float)t * MN - 1f * normMN; //Separation of .5 unit
+                Vector2 newCircleVel = (2 * Vector2.Dot(normIJ, negNormMN) * normIJ - negNormMN) * circle.Velocity.Length();
                 return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, newCircleVel);
             }
             else
             {
                 t = timeOfCornerIntersection;
-                Vector2 newCirclePos = M + (float)t * MN - 0.5f * normMN; //Separation of .5 unit
-                Vector2 newCircleVel = Vector2.Normalize(newCirclePos - I) * MN.Length();
+                Vector2 newCirclePos = M + (float)t * MN - 1f * normMN; //Separation of .5 unit
+                Vector2 newCircleVel = Vector2.Normalize(newCirclePos - I) * circle.Velocity.Length();
                 return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, newCircleVel);
             }
         }

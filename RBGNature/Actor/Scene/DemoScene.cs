@@ -72,7 +72,7 @@ namespace RBGNature.Actor.Scene
 
         public override void UpdateParent(GameTime gameTime)
         {
-            physical.Collide();
+            physical.Collide((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             writer.Origin = player.collision.Position;
             writer.Update(gameTime);
             for (int i = children.Count - 1; i >= 0; i--)

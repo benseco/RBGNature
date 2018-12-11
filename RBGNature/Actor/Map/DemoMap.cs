@@ -139,14 +139,14 @@ namespace RBGNature.Actor.Map
             }
         }
 
-        public void Collide(PhysicsGroupType groupType, ICollide other)
+        public void Collide(float s, PhysicsGroupType groupType, ICollide other)
         {
-            other.Collide(groupType, collision, null);
+            other.Collide(s, groupType, collision, null);
         }
 
-        public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
+        public CollisionResult Collide(float s, PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
         {
-            return physicsObject.Collide(collision);
+            return physicsObject.Collide(s, collision);
         }
 
         public override bool Dead()
