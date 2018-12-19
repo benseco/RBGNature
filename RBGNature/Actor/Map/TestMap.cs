@@ -43,5 +43,9 @@ namespace RBGNature.Actor.Map
         {
             return false;
         }
+
+        public override void Light(SpriteBatch spriteBatch)
+        {
+        }
     }
 }

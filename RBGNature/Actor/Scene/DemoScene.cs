@@ -62,7 +62,11 @@ namespace RBGNature.Actor.Scene
 
         public override void DrawParent(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            writer.Draw(spriteBatch, gameTime);
+            //writer.Draw(spriteBatch, gameTime);
+        }
+
+        public override void LightParent(SpriteBatch spriteBatch)
+        {
         }
 
         public override void LoadContentParent(ContentManager contentManager)
@@ -83,6 +87,35 @@ namespace RBGNature.Actor.Scene
                     children.RemoveAt(i);
                 }
             }
+
+            Color color = Color.Black;
+            float lengthOfDay = 12000;
+            float timeOfDay = (float)gameTime.TotalGameTime.TotalMilliseconds % lengthOfDay / lengthOfDay;
+            if (timeOfDay < .25)
+            {
+                color = Color.MidnightBlue;
+            }
+            else if (timeOfDay < .375)
+            {
+                color = Color.Lerp(Color.MidnightBlue, Color.LightSkyBlue, (timeOfDay - .25f) / .125f);
+            }
+            else if (timeOfDay < .5)
+            {
+                color = Color.Lerp(Color.LightSkyBlue, Color.White, (timeOfDay - .375f) / .125f);
+            }
+            else if (timeOfDay < .75)
+            {
+                color = Color.White;
+            }
+            else if (timeOfDay < .875)
+            {
+                color = Color.Lerp(Color.White, Color.Chocolate, (timeOfDay - .75f) / .125f);
+            }
+            else
+            {
+                color = Color.Lerp(Color.Chocolate, Color.MidnightBlue, (timeOfDay - .875f) / .125f);
+            }
+            Atmosphere = color;
         }
     }
 }

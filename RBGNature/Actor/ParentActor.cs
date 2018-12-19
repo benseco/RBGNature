@@ -31,9 +31,17 @@ namespace RBGNature.Actor
             this.DrawParent(gameTime, spriteBatch);
         }
 
+        public void Light(SpriteBatch spriteBatch)
+        {
+            children.ForEach(s => s.Light(spriteBatch));
+            this.LightParent(spriteBatch);
+        }
+
         public abstract void LoadContentParent(ContentManager contentManager);
         public abstract void UpdateParent(GameTime gameTime);
         public abstract void DrawParent(GameTime gameTime, SpriteBatch spriteBatch);
+        public abstract void LightParent(SpriteBatch spriteBatch);
         public abstract bool Dead();
+
     }
 }

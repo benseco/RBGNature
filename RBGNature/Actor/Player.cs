@@ -40,6 +40,7 @@ namespace RBGNature.Actor
         Texture2D textureBullet;
         Texture2D textureCannonball;
         Texture2D textureHPBar;
+        Texture2D textureLight;
         SoundEffect soundEffectGunshot;
         SoundEffect soundEffectRhythmClick;
 
@@ -116,6 +117,8 @@ namespace RBGNature.Actor
             textureCircle10 = contentManager.Load<Texture2D>("Sprites/debug/circle10");
             textureCircle200 = contentManager.Load<Texture2D>("Sprites/debug/circle200");
             textureHPBar = contentManager.Load<Texture2D>("UI/HPBar");
+
+            textureLight = contentManager.Load<Texture2D>("Sprites/light/53");
 
             soundEffectGunshot = contentManager.Load<SoundEffect>("Sound/effect/gunshot");
             soundEffectRhythmClick = contentManager.Load<SoundEffect>("Sound/effect/metronome");
@@ -310,8 +313,8 @@ namespace RBGNature.Actor
             }
             spriteBatch.Draw(animator.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(), tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
 
-            spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
-            spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            //spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            //spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureHPBar, collision.Position - new Vector2(0, 50), getHealthSpriteRect(), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
 
             foreach (Circle bullet in bullets)
@@ -452,6 +455,11 @@ namespace RBGNature.Actor
         public bool Dead()
         {
             return false;
+        }
+
+        public void Light(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(textureLight, collision.Position - new Vector2(105, 120), null, new Color(0, 255, 0), 0, Vector2.Zero, Vector2.One * 4, SpriteEffects.None, 1);
         }
     }
 }

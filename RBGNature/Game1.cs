@@ -18,8 +18,6 @@ namespace RBGNature
         RenderTarget2D lightTarget;
         BaseScene scene;
 
-        Texture2D light;
-
         private static bool Paused { get; set; }
         private static bool JustPaused { get; set; }
 
@@ -112,8 +110,6 @@ namespace RBGNature
 
             // TODO: use this.Content to load your game content here
             scene.LoadContent(Content);
-
-            light = Content.Load<Texture2D>("Sprites/light/53");
         }
 
         /// <summary>
@@ -173,47 +169,16 @@ namespace RBGNature
             previousFrameTime = currentFrameTime;
 
 
-            // TODO: Add your drawing code here
 
-            Color color = Color.Black;
-            float lengthOfDay = 12000;
-            float timeOfDay = (float)gameTime.TotalGameTime.TotalMilliseconds % lengthOfDay / lengthOfDay;
-            if (timeOfDay < .25)
-            {
-                color = Color.MidnightBlue;
-            }
-            else if (timeOfDay < .375)
-            {
-                color = Color.Lerp(Color.MidnightBlue, Color.LightSkyBlue, (timeOfDay - .25f) / .125f);
-            }
-            else if (timeOfDay < .5)
-            {
-                color = Color.Lerp(Color.LightSkyBlue, Color.White, (timeOfDay - .375f) / .125f);
-            }
-            else if (timeOfDay < .75)
-            {
-                color = Color.White;
-            }
-            else if (timeOfDay < .875)
-            {
-                color = Color.Lerp(Color.White, Color.Chocolate, (timeOfDay - .75f) / .125f);
-            }
-            else
-            {
-                color = Color.Lerp(Color.Chocolate, Color.MidnightBlue, (timeOfDay - .875f) / .125f);
-            }
-
-            //lights target
+            // Clear lightTarget with atmosphere color from scene
             GraphicsDevice.SetRenderTarget(lightTarget);
-            GraphicsDevice.Clear(color);
+            GraphicsDevice.Clear(scene.Atmosphere);
 
-
+            // Draw lights from scene onto lightTarget
             spriteBatch.Begin(blendState: Lighten, transformMatrix: scene.Camera.GetTransform());
-            //spriteBatch.Draw(light,position: scene.Camera.Position - new Vector2(31,40), scale: 4*Vector2.One, color: new Color(0,255,0));
-            spriteBatch.Draw(light, scene.Camera.Position - new Vector2(105, 120), null, new Color(0,255,0), 0, Vector2.Zero, Vector2.One*4, SpriteEffects.None, 1);
+            scene.Light(spriteBatch);
             spriteBatch.End();
-
-
+            
             //game
             GraphicsDevice.SetRenderTarget(renderTarget);
             GraphicsDevice.Clear(Color.Transparent);

@@ -193,5 +193,9 @@ namespace RBGNature.Actor.Enemy
             }
 
         }
+
+        public void Light(SpriteBatch spriteBatch)
+        {
+        }
     }
 }

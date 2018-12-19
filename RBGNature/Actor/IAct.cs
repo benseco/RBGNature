@@ -14,12 +14,7 @@ namespace RBGNature.Actor
         void LoadContent(ContentManager contentManager);
         void Update(GameTime gameTime);
         void Draw(GameTime gameTime, SpriteBatch spriteBatch);
-
-        //protected static float LayerDepth(float y)
-        //{
-        //    return y * 0.0000001f;
-        //}
-
+        void Light(SpriteBatch spriteBatch);
         bool Dead();
     }
 }
