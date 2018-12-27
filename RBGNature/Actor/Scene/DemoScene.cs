@@ -42,17 +42,18 @@ namespace RBGNature.Actor.Scene
             Item item = new Item(player, new Vector2(100, 500));
             children.Add(map);
             children.Add(player);
-            children.Add(enemy);
-            children.Add(enemy2);
+            //children.Add(enemy);
+            //children.Add(enemy2);
             children.Add(item);
 
             physical = new PhysicsGroup(PhysicsGroupType.Physical);
             physical.Add(map);
             physical.Add(player);
-            physical.Add(enemy);
-            physical.Add(enemy2);
+            //physical.Add(enemy);
+            //physical.Add(enemy2);
 
-            writer = new FragmentWriter("Fonts/TooMuchInk", example, new Rectangle(100, 450, 200, 200), Color.White);
+            writer = new FragmentWriter("Fonts/TooMuchInk", new Rectangle(100, 450, 200, 200), Color.White);
+            writer.SetText(Fragment.Parse(example));
         }
 
         public override bool Dead()
@@ -62,7 +63,8 @@ namespace RBGNature.Actor.Scene
 
         public override void DrawParent(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            //writer.Draw(spriteBatch, gameTime);
+            //writer.Draw(spriteBatch, Camera.Position);
+            Dialogue.Draw(spriteBatch, Camera.Position);
         }
 
         public override void LightParent(SpriteBatch spriteBatch)
@@ -72,13 +74,15 @@ namespace RBGNature.Actor.Scene
         public override void LoadContentParent(ContentManager contentManager)
         {
             writer.Load(contentManager);
+            Dialogue.Load(contentManager);
         }
 
         public override void UpdateParent(GameTime gameTime)
         {
-            physical.Collide((float)gameTime.ElapsedGameTime.TotalMilliseconds);
-            writer.Origin = player.collision.Position;
             writer.Update(gameTime);
+            Dialogue.Update(gameTime);
+
+            physical.Collide((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             for (int i = children.Count - 1; i >= 0; i--)
             {
                 if (children[i].Dead())

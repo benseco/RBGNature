@@ -8,10 +8,15 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Graphics.Text
 {
-    class Fragment
+    public class Fragment
     {
+        const char WORD_SEPARATOR = ' ';
+        const char EFFECT_START = '{';
+        const char EFFECT_END = '}';
+        const char PARAM_SEPARATOR = ':';
+
         public string Text { get; set; }
-        public TextEffect Effect { get; set; }
+        private TextEffect Effect { get; set; }
         private int Index { get; set; }
         private int ElapsedTime { get; set; }
         private int FrameCount { get; set; }
@@ -27,6 +32,13 @@ namespace RBGNature.Graphics.Text
             {
                 if (Effect.Wait > 0) ElapsedTime -= Effect.Wait;
             }
+        }
+
+        public void Reset()
+        {
+            Index = 0;
+            ElapsedTime = 0;
+            FrameCount = 0;
         }
 
         public Vector2 Draw(SpriteBatch spriteBatch, SpriteFont font, Vector2 position, Color color)
@@ -77,6 +89,56 @@ namespace RBGNature.Graphics.Text
             }
 
             return true;
+        }
+
+        public static List<Fragment> Parse(string source)
+        {
+
+            List<Fragment> fragments = new List<Fragment>();
+
+            StringBuilder currentWord = new StringBuilder();
+            int i = 0;
+            while (i < source.Length)
+            {
+                char c = source[i];
+                switch (c)
+                {
+                    case EFFECT_START:
+                        // If we were in the middle of building a word, add it as a fragment.
+                        if (currentWord.Length > 0)
+                        {
+                            fragments.Add(new Fragment(currentWord.ToString(), null));
+                            currentWord.Clear();
+                        }
+
+                        int endBraceIndex = source.IndexOf(EFFECT_END, i);
+                        string[] colon = source.Substring(i + 1, endBraceIndex - i - 1).Split(PARAM_SEPARATOR);
+                        TextEffect effect = new TextEffect(colon[0]);
+                        foreach (string word in colon[1].Split(WORD_SEPARATOR))
+                        {
+                            fragments.Add(new Fragment(word, effect));
+                        }
+                        i = endBraceIndex;
+                        break;
+                    case WORD_SEPARATOR:
+                        if (currentWord.Length > 0)
+                        {
+                            fragments.Add(new Fragment(currentWord.ToString(), null));
+                            currentWord.Clear();
+                        }
+                        break;
+                    default:
+                        currentWord.Append(c);
+                        break;
+                }
+                i++;
+            }
+            if (currentWord.Length > 0)
+            {
+                fragments.Add(new Fragment(currentWord.ToString(), null));
+            }
+
+            return fragments;
         }
     }
 }

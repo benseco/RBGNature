@@ -12,10 +12,7 @@ namespace RBGNature.Graphics.Text
 
     public class FragmentWriter
     {
-        const char SPACE = ' ';
-        const char BRACE_LEFT = '{';
-        const char BRACE_RIGHT = '}';
-        const char COLON = ':';
+        const char CHAR_SPACE = ' ';
 
         SpriteFont Font { get; set; }
         Rectangle TextArea { get; set; }
@@ -27,64 +24,21 @@ namespace RBGNature.Graphics.Text
         private string FontKey { get; set; }
         private int Index { get; set; }
         private Vector2 Space { get; set; }
-        public Vector2 Origin { get; set; }
 
-        public FragmentWriter(string fontKey, string source, Rectangle textArea, Color color, int speed = 100)
+        public FragmentWriter(string fontKey, Rectangle textArea, Color color, int speed = 100)
         {
             FontKey = fontKey;
             TextArea = textArea;
-            Origin = textArea.Location.ToVector2();
             Color = color;
             Speed = speed;
             Index = 0;
-            ParseFragments(source);
         }
 
-        private void ParseFragments(string source)
+        public void SetText(List<Fragment> fragments)
         {
-            Fragments = new List<Fragment>();
-
-            StringBuilder currentWord = new StringBuilder();
-            int i = 0;
-            while(i < source.Length)
-            {
-                char c = source[i];
-                switch(c)
-                {
-                    case BRACE_LEFT:
-                        // If we were in the middle of building a word, add it as a fragment.
-                        if (currentWord.Length > 0)
-                        {
-                            Fragments.Add(new Fragment(currentWord.ToString(), null));
-                            currentWord.Clear();
-                        }
-                        
-                        int endBraceIndex = source.IndexOf(BRACE_RIGHT, i);
-                        string[] colon = source.Substring(i + 1, endBraceIndex - i - 1).Split(COLON);
-                        TextEffect effect = new TextEffect(colon[0]);
-                        foreach (string word in colon[1].Split(SPACE))
-                        {
-                            Fragments.Add(new Fragment(word, effect));
-                        }
-                        i = endBraceIndex;
-                        break;
-                    case SPACE:
-                        if (currentWord.Length > 0)
-                        {
-                            Fragments.Add(new Fragment(currentWord.ToString(), null));
-                            currentWord.Clear();
-                        }
-                        break;
-                    default:
-                        currentWord.Append(c);
-                        break;
-                }
-                i++;
-            }
-            if (currentWord.Length > 0)
-            {
-                Fragments.Add(new Fragment(currentWord.ToString(), null));
-            }
+            Fragments = fragments;
+            Fragments.ForEach(f => f.Reset());
+            Index = 0;
         }
 
         public void Update(GameTime gameTime)
@@ -98,9 +52,9 @@ namespace RBGNature.Graphics.Text
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        public void Draw(SpriteBatch spriteBatch, Vector2 origin)
         {
-            Vector2 position = Origin;
+            Vector2 position = origin;
 
             // Actually do the Draw
             for (int i = 0; i <= Index; i++)
@@ -108,9 +62,9 @@ namespace RBGNature.Graphics.Text
                 Fragment fragment = Fragments[i];
 
                 Vector2 fragmentLength = Font.MeasureString(fragment.Text);
-                if (position.X + fragmentLength.X - Origin.X > TextArea.Width)
+                if (position.X + fragmentLength.X - origin.X > TextArea.Width)
                 {
-                    position = new Vector2(Origin.X, position.Y + Font.LineSpacing);
+                    position = new Vector2(origin.X, position.Y + Font.LineSpacing);
                 }
 
                 position = fragment.Draw(spriteBatch, Font, position, Color);
@@ -122,7 +76,7 @@ namespace RBGNature.Graphics.Text
         public void Load(ContentManager contentManager)
         {
             Font = contentManager.Load<SpriteFont>(FontKey);
-            Space = Font.MeasureString(SPACE.ToString());
+            Space = Font.MeasureString(CHAR_SPACE.ToString());
         }
     }
 }

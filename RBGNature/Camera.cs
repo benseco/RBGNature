@@ -2,7 +2,7 @@
 
 namespace RBGNature
 {
-    class Camera
+    public class Camera
     {
         public Camera()
         {

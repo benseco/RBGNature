@@ -59,6 +59,9 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Actor\Player.cs" />
+    <Compile Include="Graphics\Text\Dialogue.cs" />
+    <Compile Include="Graphics\Text\DialogueBite.cs" />
+    <Compile Include="Graphics\Text\DialogueSequence.cs" />
     <Compile Include="Graphics\Text\Fragment.cs" />
     <Compile Include="Graphics\Text\TextEffect.cs" />
     <Compile Include="Graphics\Text\FragmentWriter.cs" />

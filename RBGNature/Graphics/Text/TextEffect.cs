@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Graphics.Text
 {
-    enum TextEffectType
+    public enum TextEffectType
     {
         Fast,
         Slow,
@@ -18,7 +18,7 @@ namespace RBGNature.Graphics.Text
         //Wave,
     }
 
-    class TextEffect
+    public class TextEffect
     {
         List<TextEffectType> EffectTypes { get; set; }
         public int Speed { get; set; }

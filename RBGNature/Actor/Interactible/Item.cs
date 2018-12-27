@@ -7,11 +7,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using RBGNature.Graphics.Text;
 
 namespace RBGNature.Actor.Interactible
 {
     class Item : IAct
     {
+        static DialogueSequence dialogueSequence;
+
         private Player Player { get; set; }
         private Vector2 Position { get; set; }
 
@@ -19,6 +22,12 @@ namespace RBGNature.Actor.Interactible
         private bool Taken { get; set; }
         private Texture2D TextureInteractIcon { get; set; }
         private Texture2D TextureItem { get; set; }
+
+        static Item()
+        {
+            dialogueSequence = new DialogueSequence();
+            dialogueSequence.Add("Item", "hello");
+        }
 
         public Item(Player player, Vector2 position)
         {
@@ -49,8 +58,8 @@ namespace RBGNature.Actor.Interactible
                 var kstate = Keyboard.GetState();
                 if (kstate.IsKeyDown(Keys.E))
                 {
-                    //Player.IncrementItem();
-                    Taken = true;
+                    Dialogue.Start(dialogueSequence);
+                    //Taken = true;
                 }
             }
             else
