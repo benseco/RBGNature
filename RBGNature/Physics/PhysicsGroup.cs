@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,13 +28,13 @@ namespace RBGNature.Physics
             group.Remove(actor);
         }
 
-        public void Collide()
+        public void Collide(float s)
         {
             for (int i = 0; i < group.Count; i++)
             {
                 for (int j = i + 1; j < group.Count; j++)
                 {
-                    group[i].Collide(groupType, group[j]);
+                    group[i].Collide(s, groupType, group[j]);
                 }
             }
         }

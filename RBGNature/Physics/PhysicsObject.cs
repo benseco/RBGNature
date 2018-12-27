@@ -14,8 +14,8 @@ namespace RBGNature.Physics
         public float Mass = 1;
 
         // For now, PhysicsObject requires that all deriving classes be able to collide with each other
-        public abstract CollisionResult Collide(Circle c);
-        public abstract CollisionResult Collide(TriArray triArray);
+        public abstract CollisionResult Collide(float s, Circle c);
+        public abstract CollisionResult Collide(float s, TriArray triArray);
 
         public static Vector2 ClosestOnSegment(Vector2 A, Vector2 B, Vector2 P)
         {

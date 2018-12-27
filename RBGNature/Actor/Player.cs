@@ -40,13 +40,14 @@ namespace RBGNature.Actor
         Texture2D textureBullet;
         Texture2D textureCannonball;
         Texture2D textureHPBar;
+        Texture2D textureLight;
         SoundEffect soundEffectGunshot;
         SoundEffect soundEffectRhythmClick;
 
         public int CurrentHealth { get; private set; }
         const int MaxHealth = 15;
         bool tookDamage = false;
-        int timeBetweenDamage = 0;
+        float timeBetweenDamage = 0;
         Animator animator;
 
         List<Circle> bullets;
@@ -62,10 +63,10 @@ namespace RBGNature.Actor
         GunMode mode;
         private bool canChangeMode;
 
-        private int timeBetweenShots;
+        private float timeBetweenShots;
         private bool justShot;
 
-        private int shotRhythm;
+        private float shotRhythm;
         private bool countingRhythm;
         private bool rhythmReady;
 
@@ -117,12 +118,16 @@ namespace RBGNature.Actor
             textureCircle200 = contentManager.Load<Texture2D>("Sprites/debug/circle200");
             textureHPBar = contentManager.Load<Texture2D>("UI/HPBar");
 
+            textureLight = contentManager.Load<Texture2D>("Sprites/light/53");
+
             soundEffectGunshot = contentManager.Load<SoundEffect>("Sound/effect/gunshot");
             soundEffectRhythmClick = contentManager.Load<SoundEffect>("Sound/effect/metronome");
         }
 
         public void Update(GameTime gameTime)
         {
+            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            var kstate = Keyboard.GetState();
             if (collisionResult)
             {
                 // If we had a collision, start over with the collision result
@@ -132,45 +137,70 @@ namespace RBGNature.Actor
             }
             else
             {
-                collision.Position += collision.Velocity;
+                collision.Position += collision.Velocity * elapsedTime;
+
             }
 
-            camera.MoveTo(collision.Position);
 
-            float speed = .15f;
-            int ellapsedTime = gameTime.ElapsedGameTime.Milliseconds;
-            float distance = speed * ellapsedTime;
-
+            float speed = .2f;
             Vector2 inputVelocity = Vector2.Zero;
-
-            var kstate = Keyboard.GetState();
 
             if (kstate.IsKeyDown(Keys.W))
             {
-                inputVelocity.Y -= distance;
+                inputVelocity.Y -= 1;
                 animator.Set(animDict_Run[RunAnimation.Back]);
             }
 
             if (kstate.IsKeyDown(Keys.S))
             {
-                inputVelocity.Y += distance;
+                inputVelocity.Y += 1;
                 animator.Set(animDict_Run[RunAnimation.Front]);
             }
 
             if (kstate.IsKeyDown(Keys.A))
             {
-                inputVelocity.X -= distance;
+                inputVelocity.X -= 1;
                 animator.Set(animDict_Run[RunAnimation.Left]);
             }
 
             if (kstate.IsKeyDown(Keys.D))
             {
-                inputVelocity.X += distance;
+                inputVelocity.X += 1;
                 animator.Set(animDict_Run[RunAnimation.Right]);
             }
-            collision.Velocity = collision.Velocity * 0.7f + inputVelocity * 0.3f;
 
+            if (inputVelocity == Vector2.Zero)
+            {
+                float previousSpeed = collision.Velocity.Length();
+                if (previousSpeed > .01f)
+                {
+                    collision.Velocity *= .3f;
+                }
+                else
+                {
+                    collision.Velocity = Vector2.Zero;
+                }
+            }
+            else
+            {
+                if (inputVelocity.X != 0 && inputVelocity.Y != 0) { inputVelocity.Normalize(); } //TODO: Performance?
 
+                Vector2 newDirection;
+                float previousSpeed = collision.Velocity.Length();
+                if (previousSpeed > .01f)
+                {
+                    Vector2 compromise = collision.Velocity / previousSpeed + inputVelocity;
+                    newDirection = compromise == Vector2.Zero ? compromise : Vector2.Normalize(compromise);
+                }
+                else
+                {
+                    newDirection = inputVelocity;
+                    previousSpeed = 0; // Round this down to improve accuracy
+                }
+                collision.Velocity = newDirection * (speed * .7f + previousSpeed * .3f);
+            }
+
+            camera.MoveTo(collision.Position);
 
             if (kstate.IsKeyDown(Keys.F))
             {
@@ -188,7 +218,7 @@ namespace RBGNature.Actor
             cannonballsToRemove.ForEach(b => cannonballs.Remove(b));
 
             var mstate = Mouse.GetState();
-            timeBetweenShots += ellapsedTime;
+            timeBetweenShots += elapsedTime;
             if (mstate.LeftButton == ButtonState.Pressed)
             {
                 if (timeBetweenShots > 100 && !justShot)
@@ -198,7 +228,7 @@ namespace RBGNature.Actor
                         bullets.Add(new Circle()
                         {
                             Position = camera.Position,
-                            Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 4,
+                            Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * .5f,
                             Mass = 1,
                             Radius = 3
                         });
@@ -208,7 +238,7 @@ namespace RBGNature.Actor
                         cannonballs.Add(new Circle()
                         {
                             Position = camera.Position,
-                            Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * 2,
+                            Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * .25f,
                             Mass = 1,
                             Radius = 6
                         });
@@ -255,17 +285,17 @@ namespace RBGNature.Actor
 
             foreach (Circle bullet in bullets)
             {
-                bullet.Position += bullet.Velocity;
+                bullet.Position += bullet.Velocity * elapsedTime;
             }
             foreach (Circle cannonball in cannonballs)
             {
-                cannonball.Position += cannonball.Velocity;
+                cannonball.Position += cannonball.Velocity * elapsedTime;
             }
 
             animator.Update(gameTime);
             if (tookDamage)
             {
-                timeBetweenDamage += ellapsedTime;
+                timeBetweenDamage += elapsedTime;
             }
             if (timeBetweenDamage > 100)
             {
@@ -283,8 +313,8 @@ namespace RBGNature.Actor
             }
             spriteBatch.Draw(animator.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(), tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
 
-            spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
-            spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            //spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            //spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureHPBar, collision.Position - new Vector2(0, 50), getHealthSpriteRect(), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
 
             foreach (Circle bullet in bullets)
@@ -324,14 +354,14 @@ namespace RBGNature.Actor
             return null;
         }
 
-        public void Collide(PhysicsGroupType groupType, ICollide other)
+        public void Collide(float s, PhysicsGroupType groupType, ICollide other)
         {
             if (groupType == PhysicsGroupType.Physical)
             {
                 for (int i = bullets.Count - 1; i >= 0; i--)
                 {
                     Circle bullet = bullets[i];
-                    CollisionResult bulletCollision = other.Collide(groupType, bullet, bulletIdentity);
+                    CollisionResult bulletCollision = other.Collide(s, groupType, bullet, bulletIdentity);
                     if (bulletCollision)
                     {
                         bulletsToRemove.Add(bullet);
@@ -343,16 +373,16 @@ namespace RBGNature.Actor
                 for (int i = cannonballs.Count - 1; i >= 0; i--)
                 {
                     Circle cannonball = cannonballs[i];
-                    CollisionResult cannonballCollision = other.Collide(groupType, cannonball, cannonballIdentity);
+                    CollisionResult cannonballCollision = other.Collide(s, groupType, cannonball, cannonballIdentity);
                     if (cannonballCollision)
                     {
                         cannonballsToRemove.Add(cannonball);
                         cannonball.Position = cannonballCollision.PositionA;
-                        //bullet.Velocity = bulletCollision.VelocityA;
+                        //cannonball.Velocity = cannonballCollision.VelocityA;
                     }
 
                 }
-                CollisionResult playerCollision = other.Collide(groupType, this.collision, null);
+                CollisionResult playerCollision = other.Collide(s, groupType, this.collision, null);
                 if (playerCollision)
                 {
                     if (collisionResult)
@@ -370,7 +400,7 @@ namespace RBGNature.Actor
             }
         }
 
-        public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
+        public CollisionResult Collide(float s, PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
         {
             CollisionResult response = CollisionResult.None;
             if (groupType == PhysicsGroupType.Physical)
@@ -378,7 +408,7 @@ namespace RBGNature.Actor
                 for (int i = bullets.Count - 1; i >= 0; i--)
                 {
                     Circle bullet = bullets[i];
-                    CollisionResult bulletCollision = physicsObject.Collide(bullet);
+                    CollisionResult bulletCollision = physicsObject.Collide(s, bullet);
                     if (bulletCollision)
                     {
                         bulletsToRemove.Add(bullet);
@@ -391,18 +421,18 @@ namespace RBGNature.Actor
                 for (int i = cannonballs.Count - 1; i >= 0; i--)
                 {
                     Circle cannonball = cannonballs[i];
-                    CollisionResult cannonballCollision = physicsObject.Collide(cannonball);
+                    CollisionResult cannonballCollision = physicsObject.Collide(s, cannonball);
                     if (cannonballCollision)
                     {
                         cannonballsToRemove.Add(cannonball);
                         cannonball.Position = cannonballCollision.PositionB;
-                        //bullet.Velocity = bulletCollision.VelocityB;
+                        //cannonball.Velocity = cannonballCollision.VelocityB;
                         cannonballCollision.Identity = cannonballIdentity;
                         response = cannonballCollision;
                     }
                 }
 
-                CollisionResult playerCollision = physicsObject.Collide(collision);
+                CollisionResult playerCollision = physicsObject.Collide(s, collision);
                 if (playerCollision)
                 {
                     if (collisionResult)
@@ -425,6 +455,11 @@ namespace RBGNature.Actor
         public bool Dead()
         {
             return false;
+        }
+
+        public void Light(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(textureLight, collision.Position - new Vector2(105, 120), null, new Color(0, 255, 0), 0, Vector2.Zero, Vector2.One * 4, SpriteEffects.None, 1);
         }
     }
 }

@@ -11,16 +11,16 @@ namespace RBGNature.Physics
     {
         public float Radius { get; set; }
 
-        public override CollisionResult Collide(Circle c)
+        public override CollisionResult Collide(float s, Circle c)
         {
-            return CollideCircleAtTime(c, out double t);
+            return CollideCircleAtTime(s, c, out double t);
         }
 
-        public CollisionResult CollideCircleAtTime(Circle c, out double t)
+        public CollisionResult CollideCircleAtTime(float s, Circle c, out double t)
         {
             t = -1;//arbitrary error case
 
-            Vector2 vel = Velocity - c.Velocity;
+            Vector2 vel = Velocity * s - c.Velocity * s;
             Vector2 pos = Position - c.Position;
 
             Vector2 d = ClosestOnSegment(pos, pos + vel, Vector2.Zero);
@@ -32,45 +32,61 @@ namespace RBGNature.Physics
                 // Projection of c center on this circle's velocity vector
                 Vector2 a = Vector2.Zero - pos;
                 Vector2 b = vel;
-                Vector2 projection = pos + (Vector2.Dot(a, b) / b.LengthSquared()) * b;
+                float aDotB = Vector2.Dot(a, b);
+                if (aDotB < .0001f) { return CollisionResult.None; } // This can happen if the collision is tangential, so just ignore it for now?
+                Vector2 projection = pos + (aDotB / b.LengthSquared()) * b;
 
                 // Calculate leg of right triangle: the distance from the closest point where the circles actually collided
                 double legSquared = Math.Pow(Radius + c.Radius, 2) - (projection - Vector2.Zero).LengthSquared();
 
                 // The percentage of time in this step that passes before the collision
                 t = 1 - (legSquared / Vector2.DistanceSquared(pos, projection));
+                if (t < -1 || t > 1) { return CollisionResult.None; } // When does this happen and why is it bad?
 
                 // The position of the circles at time of collision
-                Vector2 newPos = Position + Velocity * (float)t;
-                Vector2 cNewPos = c.Position + c.Velocity * (float)t;
+                Vector2 newPos = Position + Velocity * s * (float)t;
+                Vector2 cNewPos = c.Position + c.Velocity * s * (float)t;
 
                 // Calculate response (bounce)
 
                 // The norm of the vector between the two circles
                 Vector2 n = Vector2.Normalize(cNewPos - newPos);
 
-                // impulse magnitude?
+
+                ////Reflection
+                //Vector2 reflection = Velocity - 2 * Vector2.Dot(Velocity, n) * n;
+                //Vector2 cReflection = c.Velocity - 2 * Vector2.Dot(c.Velocity, n) * n;
+
+                //float totalMass = Mass + c.Mass;
+                //Vector2 lerp = Vector2.Lerp(reflection, Velocity, Mass / totalMass);
+                //Vector2 cLerp = Vector2.Lerp(cReflection, c.Velocity, c.Mass / totalMass);
+
+                //Vector2 newV = lerp;
+                //Vector2 cNewV = cLerp;
+
+                //impulse magnitude?
                 Vector2 deltaV = Velocity - c.Velocity;
                 float magnitude = deltaV.Length();
 
-                // Resultant velocities
+                //Resultant velocities
                 Vector2 newV = Velocity - (1 / Mass) * magnitude * n;
                 Vector2 cNewV = c.Velocity + (1 / c.Mass) * magnitude * n;
 
+
                 // Add some separation (.01f is arbitrary ?)
-                newPos = newPos + newV * .01f;
-                cNewPos = cNewPos + cNewV * .01f;
+                //newPos = newPos + newV * .01f;
+                //cNewPos = cNewPos + cNewV * .01f;
 
                 return new CollisionResult(newPos, newV, cNewPos, cNewV);
             }
             else return CollisionResult.None;
         }
 
-        public override CollisionResult Collide(TriArray triArray)
+        public override CollisionResult Collide(float s, TriArray triArray)
         {
             //Implemented in TriArray.cs
             //So we negate the impulse
-            return triArray.Collide(this).Switch();
+            return triArray.Collide(s, this).Switch();
         }
 
         /// <summary>

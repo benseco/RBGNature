@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,14 +34,14 @@ namespace RBGNature.Physics
             this.array = array;
         }
 
-        public override CollisionResult Collide(Circle c)
+        public override CollisionResult Collide(float s, Circle c)
         {
             //int xIndex = (int)(c.Position.X / 20);
             //int yIndex = (int)(c.Position.Y / 20);
             int xMin = (int)((c.Position.X - c.Radius) / 20) - 1;
-            int xMax = (int)((c.Position.X + c.Velocity.X + c.Radius) / 20) + 1;
+            int xMax = (int)((c.Position.X + c.Velocity.X * s + c.Radius) / 20) + 1;
             int yMin = (int)((c.Position.Y - c.Radius) / 20) - 1;
-            int yMax = (int)((c.Position.Y + c.Velocity.Y + c.Radius) / 20) + 1;
+            int yMax = (int)((c.Position.Y + c.Velocity.Y * s + c.Radius) / 20) + 1;
 
             //Console.Write("Index: " + xIndex + ", " + yIndex);
             //Console.Write(" | XBounds: " + xMin + " - " + xMax);
@@ -61,7 +62,7 @@ namespace RBGNature.Physics
                     {
                         if (array[i, j, k] != 1) continue; //triangle does not collide
                         
-                        CollisionResult result = GetTriangle(i, j, k).CollideCircleAtTime(c, out double cTime);
+                        CollisionResult result = GetTriangle(i, j, k).CollideCircleAtTime(s, c, out double cTime);
 
                         if (result && cTime >= 0 && cTime <= time)
                         {
@@ -75,7 +76,7 @@ namespace RBGNature.Physics
             return first;
         }
 
-        public override CollisionResult Collide(TriArray triArray)
+        public override CollisionResult Collide(float s, TriArray triArray)
         {
             throw new NotImplementedException();
         }

@@ -65,5 +65,9 @@ namespace RBGNature.Actor.Interactible
         {
             return Taken;
         }
+
+        public void Light(SpriteBatch spriteBatch)
+        {
+        }
     }
 }

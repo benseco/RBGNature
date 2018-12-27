@@ -44,14 +44,14 @@ namespace RBGNature.Actor.Enemy
             random = new Random(234);
         }
 
-        public void Collide(PhysicsGroupType groupType, ICollide other)
+        public void Collide(float s, PhysicsGroupType groupType, ICollide other)
         {
             if (groupType == PhysicsGroupType.Physical)
             {
                 for (int i = bullets.Count - 1; i >= 0; i--)
                 {
                     Circle bullet = bullets[i];
-                    CollisionResult bulletCollision = other.Collide(groupType, bullet, bulletIdentity);
+                    CollisionResult bulletCollision = other.Collide(s, groupType, bullet, bulletIdentity);
                     if (bulletCollision)
                     {
                         bullets.RemoveAt(i);
@@ -59,17 +59,17 @@ namespace RBGNature.Actor.Enemy
                         //bullet.Velocity = bulletCollision.VelocityB;
                     }
                 }
-                CollisionResult result = other.Collide(groupType, collision, null);
+                CollisionResult result = other.Collide(s, groupType, collision, null);
                 if (result)
                 {
                     collision.Position = result.PositionA;
-                    collision.Velocity = result.VelocityA - collision.Velocity;
+                    collision.Velocity = result.VelocityA;
                     takeDamage(result.Identity);
                 }
             }
         }
 
-        public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
+        public CollisionResult Collide(float s, PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
         {
             CollisionResult response = CollisionResult.None;
             if (groupType == PhysicsGroupType.Physical)
@@ -77,7 +77,7 @@ namespace RBGNature.Actor.Enemy
                 for (int i = bullets.Count - 1; i >= 0; i--)
                 {
                     Circle bullet = bullets[i];
-                    CollisionResult bulletCollision = physicsObject.Collide(bullet);
+                    CollisionResult bulletCollision = physicsObject.Collide(s, bullet);
                     if (bulletCollision)
                     {
                         bullets.RemoveAt(i);
@@ -87,11 +87,11 @@ namespace RBGNature.Actor.Enemy
                         response = bulletCollision;
                     }
                 }
-                CollisionResult result = physicsObject.Collide(collision);
+                CollisionResult result = physicsObject.Collide(s, collision);
                 if (result)
                 {
                     collision.Position = result.PositionB;
-                    collision.Velocity = result.VelocityB - collision.Velocity;
+                    collision.Velocity = result.VelocityB;
                     takeDamage(identity);
                     response = result;
                 }
@@ -151,28 +151,28 @@ namespace RBGNature.Actor.Enemy
             }
         }
 
-        int timeBetweenShots = 0;
+        float timeBetweenShots = 0;
         Vector2 headOffset = new Vector2(0, -25);
-        int timeBetweenDamage = 0;
+        float timeBetweenDamage = 0;
 
         public void Update(GameTime gameTime)
         {
-            collision.Position += collision.Velocity;
-            collision.Velocity = new Vector2(random.Next(-2, 3), random.Next(-2, 3)) * 0.05f + collision.Velocity * 0.92f + Vector2.Normalize((player.collision.Position - collision.Position)) * 0.03f;
+            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            collision.Position += collision.Velocity * elapsedTime;
+            collision.Velocity = .5f * (new Vector2(random.Next(-1, 2), random.Next(-1, 2)) * 0.05f + collision.Velocity * 0.92f + Vector2.Normalize((player.collision.Position - collision.Position)) * 0.03f);
             foreach (Circle bullet in bullets)
             {
-                bullet.Position += bullet.Velocity;
+                bullet.Position += bullet.Velocity * elapsedTime;
             }
 
-            float speed = .15f;
-            int ellapsedTime = gameTime.ElapsedGameTime.Milliseconds;
-            timeBetweenShots += ellapsedTime;
+            float speed = .01f;
+            timeBetweenShots += elapsedTime;
             if (timeBetweenShots > 1000)
             {
                 timeBetweenShots = 0;
                 Vector2 bulletOrigin = this.collision.Position + headOffset;
                 Vector2 bulletDirection = player.collision.Position + player.collision.Velocity * 40 - bulletOrigin;
-                Vector2 bulletVelocity = Vector2.Normalize(bulletDirection) * speed * ellapsedTime;
+                Vector2 bulletVelocity = Vector2.Normalize(bulletDirection) * speed * elapsedTime;
                 bullets.Add(new Circle()
                 {
                     Position = bulletOrigin,
@@ -184,7 +184,7 @@ namespace RBGNature.Actor.Enemy
 
             if (tookDamage)
             {
-                timeBetweenDamage += ellapsedTime;
+                timeBetweenDamage += elapsedTime;
             }
             if (timeBetweenDamage > 100)
             {
@@ -192,6 +192,10 @@ namespace RBGNature.Actor.Enemy
                 tookDamage = false;
             }
 
+        }
+
+        public void Light(SpriteBatch spriteBatch)
+        {
         }
     }
 }

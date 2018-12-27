@@ -18,8 +18,6 @@ namespace RBGNature
         RenderTarget2D lightTarget;
         BaseScene scene;
 
-        Texture2D light;
-
         private static bool Paused { get; set; }
         private static bool JustPaused { get; set; }
 
@@ -55,6 +53,8 @@ namespace RBGNature
 
         public Game1()
         {
+            IsFixedTimeStep = false;
+            //TargetElapsedTime = System.TimeSpan.FromSeconds(1.0f / 240.0f);
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -80,6 +80,7 @@ namespace RBGNature
             graphics.IsFullScreen = false;
             graphics.PreferredBackBufferWidth = 2560;
             graphics.PreferredBackBufferHeight = 1440;
+            //graphics.SynchronizeWithVerticalRetrace = false;
             graphics.ApplyChanges();
 
             // set up render target
@@ -109,8 +110,6 @@ namespace RBGNature
 
             // TODO: use this.Content to load your game content here
             scene.LoadContent(Content);
-
-            light = Content.Load<Texture2D>("Sprites/light/53");
         }
 
         /// <summary>
@@ -145,8 +144,11 @@ namespace RBGNature
             scene.Update(gameTime);
 
             base.Update(gameTime);
+
+            updateCount++;
         }
 
+        int updateCount = 0;
         double previousFrameTime;
 
         /// <summary>
@@ -156,54 +158,27 @@ namespace RBGNature
         protected override void Draw(GameTime gameTime)
         {
             double currentFrameTime = gameTime.ElapsedGameTime.TotalSeconds;
+
+            //System.Console.WriteLine("FPS:" + 1 / currentFrameTime + " | " + updateCount);
+            updateCount = 0;
+
             if (currentFrameTime > previousFrameTime)
             {
-                System.Console.WriteLine("Frame took too long: " + gameTime.ElapsedGameTime.TotalSeconds + "s");
+                //System.Console.WriteLine("Frame took too long: " + gameTime.ElapsedGameTime.TotalSeconds + "s");
             }
             previousFrameTime = currentFrameTime;
 
 
-            // TODO: Add your drawing code here
 
-            Color color = Color.Black;
-            float lengthOfDay = 12000;
-            float timeOfDay = (float)gameTime.TotalGameTime.TotalMilliseconds % lengthOfDay / lengthOfDay;
-            if (timeOfDay < .25)
-            {
-                color = Color.MidnightBlue;
-            }
-            else if (timeOfDay < .375)
-            {
-                color = Color.Lerp(Color.MidnightBlue, Color.LightSkyBlue, (timeOfDay - .25f) / .125f);
-            }
-            else if (timeOfDay < .5)
-            {
-                color = Color.Lerp(Color.LightSkyBlue, Color.White, (timeOfDay - .375f) / .125f);
-            }
-            else if (timeOfDay < .75)
-            {
-                color = Color.White;
-            }
-            else if (timeOfDay < .875)
-            {
-                color = Color.Lerp(Color.White, Color.Chocolate, (timeOfDay - .75f) / .125f);
-            }
-            else
-            {
-                color = Color.Lerp(Color.Chocolate, Color.MidnightBlue, (timeOfDay - .875f) / .125f);
-            }
-
-            //lights target
+            // Clear lightTarget with atmosphere color from scene
             GraphicsDevice.SetRenderTarget(lightTarget);
-            GraphicsDevice.Clear(color);
+            GraphicsDevice.Clear(scene.Atmosphere);
 
-
+            // Draw lights from scene onto lightTarget
             spriteBatch.Begin(blendState: Lighten, transformMatrix: scene.Camera.GetTransform());
-            //spriteBatch.Draw(light,position: scene.Camera.Position - new Vector2(31,40), scale: 4*Vector2.One, color: new Color(0,255,0));
-            spriteBatch.Draw(light, scene.Camera.Position - new Vector2(105, 120), null, new Color(0,255,0), 0, Vector2.Zero, Vector2.One*4, SpriteEffects.None, 1);
+            scene.Light(spriteBatch);
             spriteBatch.End();
-
-
+            
             //game
             GraphicsDevice.SetRenderTarget(renderTarget);
             GraphicsDevice.Clear(Color.Transparent);

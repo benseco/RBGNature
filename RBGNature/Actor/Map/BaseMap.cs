@@ -14,6 +14,7 @@ namespace RBGNature.Actor.Map
     {
         public abstract bool Dead();
         public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
+        public abstract void Light(SpriteBatch spriteBatch);
         public abstract void LoadContent(ContentManager contentManager);
         public abstract void Update(GameTime gameTime);
     }

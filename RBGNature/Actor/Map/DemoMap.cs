@@ -125,7 +125,7 @@ namespace RBGNature.Actor.Map
         {
             spriteBatch.Draw(textureMap0, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
-            //return;
+            return;
             for (int i = 0; i < collisionData.GetLength(0); i++)
             {
                 for (int j = 0; j < collisionData.GetLength(1); j++)
@@ -139,19 +139,23 @@ namespace RBGNature.Actor.Map
             }
         }
 
-        public void Collide(PhysicsGroupType groupType, ICollide other)
+        public void Collide(float s, PhysicsGroupType groupType, ICollide other)
         {
-            other.Collide(groupType, collision, null);
+            other.Collide(s, groupType, collision, null);
         }
 
-        public CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
+        public CollisionResult Collide(float s, PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
         {
-            return physicsObject.Collide(collision);
+            return physicsObject.Collide(s, collision);
         }
 
         public override bool Dead()
         {
             return false;
+        }
+
+        public override void Light(SpriteBatch spriteBatch)
+        {
         }
     }
 }

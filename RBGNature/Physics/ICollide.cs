@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework;
 
 namespace RBGNature.Physics
 {
     interface ICollide
     {
-        void Collide(PhysicsGroupType groupType, ICollide other);
-        CollisionResult Collide(PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity);
+        void Collide(float s, PhysicsGroupType groupType, ICollide other);
+        CollisionResult Collide(float s, PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity);
     }
 }
