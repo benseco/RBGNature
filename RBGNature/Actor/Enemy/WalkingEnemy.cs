@@ -6,12 +6,24 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using RBGNature.Graphics.Animate;
 using RBGNature.Physics;
 
 namespace RBGNature.Actor.Enemy
 {
     class WalkingEnemy : IAct, ICollide
     {
+        enum WalkAnimation
+        {
+            Front,
+            Back,
+            Left,
+            Right
+        }
+
+        static AnimationDictionary<WalkAnimation> animDict_Walk;
+
+
         Circle collision;
         Texture2D textureFront;
         Texture2D textureCircle10;
@@ -23,11 +35,19 @@ namespace RBGNature.Actor.Enemy
         const int MaxHealth = 15;
         bool tookDamage = false;
         Random random;
+        Animator animator;
 
         static CollisionIdentity bulletIdentity = new CollisionIdentity()
         {
             Damage = 1
         };
+
+        static WalkingEnemy()
+        {
+            animDict_Walk = new AnimationDictionary<WalkAnimation>();
+            animDict_Walk[WalkAnimation.Left] = new Animation("Sprites/enemy/redTitan/redtitan_walk_left", 100, 10, 30, 30);
+            animDict_Walk[WalkAnimation.Right] = new Animation("Sprites/enemy/redTitan/redtitan_walk_right", 100, 10, 30, 30);
+        }
 
         public WalkingEnemy(Vector2 position, Player player)
         {
@@ -42,6 +62,7 @@ namespace RBGNature.Actor.Enemy
             bullets = new List<Circle>();
             CurrentHealth = MaxHealth;
             random = new Random(234);
+            animator = new Animator(animDict_Walk[WalkAnimation.Left]);
         }
 
         public void Collide(float s, PhysicsGroupType groupType, ICollide other)
@@ -110,7 +131,7 @@ namespace RBGNature.Actor.Enemy
             {
                 tint = Color.Red;
             }
-            spriteBatch.Draw(textureFront, collision.Position - new Vector2(10, 30), null, tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
+            spriteBatch.Draw(animator.Texture, collision.Position - new Vector2(15, 25), animator.NextFrame(), tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
             spriteBatch.Draw(textureCircle10, collision.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
             foreach (Circle bullet in bullets)
@@ -126,6 +147,7 @@ namespace RBGNature.Actor.Enemy
             textureBullet = contentManager.Load<Texture2D>("Sprites/enemy/effect/square flower - corrupt bullet");
             textureCircle10 = contentManager.Load<Texture2D>("Sprites/debug/circle10");
             textureHPBar = contentManager.Load<Texture2D>("UI/HPBar");
+            animDict_Walk.Load(contentManager);
         }
 
         public bool Dead()
@@ -152,27 +174,48 @@ namespace RBGNature.Actor.Enemy
         }
 
         float timeBetweenShots = 0;
-        Vector2 headOffset = new Vector2(0, -25);
+        Vector2 headOffset = new Vector2(0, -15);
         float timeBetweenDamage = 0;
+        float speed = .05f;
 
         public void Update(GameTime gameTime)
         {
             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             collision.Position += collision.Velocity * elapsedTime;
-            collision.Velocity = .5f * (new Vector2(random.Next(-1, 2), random.Next(-1, 2)) * 0.05f + collision.Velocity * 0.92f + Vector2.Normalize((player.collision.Position - collision.Position)) * 0.03f);
+            //collision.Velocity = .5f * (new Vector2(random.Next(-1, 2), random.Next(-1, 2)) * 0.05f + collision.Velocity * 0.92f + Vector2.Normalize((player.collision.Position - collision.Position)) * 0.03f);
+            if (collision.Velocity == Vector2.Zero)
+            {
+                collision.Velocity = speed * Vector2.Normalize(player.collision.Position - collision.Position);
+            }
+            else
+            {
+                collision.Velocity = speed * (Vector2.Normalize(collision.Velocity) * 0.92f + Vector2.Normalize(player.collision.Position - collision.Position) * .08f);
+            }
+
+            bool left = false;
+            if (Vector2.Dot(collision.Velocity, new Vector2(1,0)) < 0)
+            {
+                animator.Set(animDict_Walk[WalkAnimation.Left]);
+                left = true;
+            }
+            else
+            {
+                animator.Set(animDict_Walk[WalkAnimation.Right]);
+            }
+
             foreach (Circle bullet in bullets)
             {
                 bullet.Position += bullet.Velocity * elapsedTime;
             }
 
-            float speed = .01f;
+            float bulletSpeed = .01f;
             timeBetweenShots += elapsedTime;
             if (timeBetweenShots > 1000)
             {
                 timeBetweenShots = 0;
-                Vector2 bulletOrigin = this.collision.Position + headOffset;
+                Vector2 bulletOrigin = this.collision.Position + headOffset + (left ? new Vector2(-4,0) : new Vector2(4,0));
                 Vector2 bulletDirection = player.collision.Position + player.collision.Velocity * 40 - bulletOrigin;
-                Vector2 bulletVelocity = Vector2.Normalize(bulletDirection) * speed * elapsedTime;
+                Vector2 bulletVelocity = Vector2.Normalize(bulletDirection) * bulletSpeed * elapsedTime;
                 bullets.Add(new Circle()
                 {
                     Position = bulletOrigin,
@@ -192,6 +235,7 @@ namespace RBGNature.Actor.Enemy
                 tookDamage = false;
             }
 
+            animator.Update(gameTime);
         }
 
         public void Light(SpriteBatch spriteBatch)

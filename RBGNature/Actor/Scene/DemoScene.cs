@@ -43,14 +43,14 @@ namespace RBGNature.Actor.Scene
             children.Add(map);
             children.Add(player);
             //children.Add(enemy);
-            //children.Add(enemy2);
+            children.Add(enemy2);
             children.Add(item);
 
             physical = new PhysicsGroup(PhysicsGroupType.Physical);
             physical.Add(map);
             physical.Add(player);
             //physical.Add(enemy);
-            //physical.Add(enemy2);
+            physical.Add(enemy2);
 
             writer = new FragmentWriter("Fonts/TooMuchInk", new Rectangle(100, 450, 200, 200), Color.White);
             writer.SetText(Fragment.Parse(example));
