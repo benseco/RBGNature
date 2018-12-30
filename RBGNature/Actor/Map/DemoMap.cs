@@ -125,7 +125,7 @@ namespace RBGNature.Actor.Map
         {
             spriteBatch.Draw(textureMap0, Vector2.Zero, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
-            return;
+            //return;
             for (int i = 0; i < collisionData.GetLength(0); i++)
             {
                 for (int j = 0; j < collisionData.GetLength(1); j++)

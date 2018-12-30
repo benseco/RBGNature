@@ -26,7 +26,7 @@ namespace RBGNature.Actor.Interactible
         static Item()
         {
             dialogueSequence = new DialogueSequence();
-            dialogueSequence.Add("Item", "hello");
+            dialogueSequence.Add("Item", "Hello there {Jitter,Color.Orange:Monet} how are you feeling today?");
         }
 
         public Item(Player player, Vector2 position)
