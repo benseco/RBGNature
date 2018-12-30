@@ -127,6 +127,7 @@ namespace RBGNature.Actor
         public void Update(GameTime gameTime)
         {
             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            System.Console.WriteLine(collision.Velocity);
             var kstate = Keyboard.GetState();
             if (collisionResult)
             {
