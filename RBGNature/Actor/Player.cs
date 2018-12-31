@@ -141,9 +141,14 @@ namespace RBGNature.Actor
             soundEffectRhythmClick = contentManager.Load<SoundEffect>("Sound/effect/metronome");
         }
 
-        /* Monet: Added to track what input direction was last pressed to play correct idle animation */
+        /// <summary>
+        /// Tracks what input direction was last pressed to play correct idle animation
+        /// </summary>
         FourDirectionAnimation lastInputDirection = FourDirectionAnimation.Front;
-        /* Monet: Added to track if the game has played the run stop animation yet */
+
+        /// <summary>
+        /// Tracks if the game has played the run stop animation yet
+        /// </summary>
         Boolean playedRunStopAnimation = false;
         float runStopAnimationFrameTime = 200;
 
