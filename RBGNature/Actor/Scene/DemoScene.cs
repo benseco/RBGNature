@@ -38,7 +38,7 @@ namespace RBGNature.Actor.Scene
             map = new DemoMap();
             player = new Player(Camera);
             TestEnemy enemy = new TestEnemy(new Vector2(200, 600), player);
-            WalkingEnemy enemy2 = new WalkingEnemy(new Vector2(300, 600), player);
+            WalkingEnemy enemy2 = new WalkingEnemy(new Vector2(295, 365), player);
             Item item = new Item(player, new Vector2(100, 500));
             children.Add(map);
             children.Add(player);
@@ -64,7 +64,7 @@ namespace RBGNature.Actor.Scene
         public override void DrawParent(GameTime gameTime, SpriteBatch spriteBatch)
         {
             //writer.Draw(spriteBatch, Camera.Position);
-            Dialogue.Draw(spriteBatch, Camera.Position);
+            Dialogue.Draw(spriteBatch, Camera.Position + new Vector2(-160, 60));
         }
 
         public override void LightParent(SpriteBatch spriteBatch)

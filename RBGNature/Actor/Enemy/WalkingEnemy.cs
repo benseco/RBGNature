@@ -65,6 +65,8 @@ namespace RBGNature.Actor.Enemy
             animator = new Animator(animDict_Walk[WalkAnimation.Left]);
         }
 
+        private CollisionResult collisionResult = CollisionResult.None;
+
         public void Collide(float s, PhysicsGroupType groupType, ICollide other)
         {
             if (groupType == PhysicsGroupType.Physical)
@@ -83,8 +85,15 @@ namespace RBGNature.Actor.Enemy
                 CollisionResult result = other.Collide(s, groupType, collision, null);
                 if (result)
                 {
-                    collision.Position = result.PositionA;
-                    collision.Velocity = result.VelocityA;
+                    if (collisionResult)
+                    {
+                        collisionResult.PositionA = collision.Position;
+                        collisionResult.VelocityA = Vector2.Zero;
+                    }
+                    else
+                    {
+                        collisionResult = result;
+                    }
                     takeDamage(result.Identity);
                 }
             }
@@ -111,8 +120,15 @@ namespace RBGNature.Actor.Enemy
                 CollisionResult result = physicsObject.Collide(s, collision);
                 if (result)
                 {
-                    collision.Position = result.PositionB;
-                    collision.Velocity = result.VelocityB;
+                    if (collisionResult)
+                    {
+                        collisionResult.PositionA = collision.Position;
+                        collisionResult.VelocityA = Vector2.Zero;
+                    }
+                    else
+                    {
+                        collisionResult = result.Switch();
+                    }
                     takeDamage(identity);
                     response = result;
                 }
@@ -181,15 +197,30 @@ namespace RBGNature.Actor.Enemy
         public void Update(GameTime gameTime)
         {
             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            collision.Position += collision.Velocity * elapsedTime;
-            //collision.Velocity = .5f * (new Vector2(random.Next(-1, 2), random.Next(-1, 2)) * 0.05f + collision.Velocity * 0.92f + Vector2.Normalize((player.collision.Position - collision.Position)) * 0.03f);
-            if (collision.Velocity == Vector2.Zero)
+
+            if (collisionResult)
             {
-                collision.Velocity = speed * Vector2.Normalize(player.collision.Position - collision.Position);
+                collision.Position = collisionResult.PositionA;
+                collision.Velocity = collisionResult.VelocityA;
+                collisionResult = CollisionResult.None;
             }
             else
             {
-                collision.Velocity = speed * (Vector2.Normalize(collision.Velocity) * 0.92f + Vector2.Normalize(player.collision.Position - collision.Position) * .08f);
+                collision.Position += collision.Velocity * elapsedTime;
+                collision.Velocity *= .1f;
+                //collision.Velocity = .5f * (new Vector2(random.Next(-1, 2), random.Next(-1, 2)) * 0.05f + collision.Velocity * 0.92f + Vector2.Normalize((player.collision.Position - collision.Position)) * 0.03f);
+
+                //collision.Velocity = speed * Vector2.Normalize(player.collision.Position - collision.Position);
+                /*
+                if (collision.Velocity == Vector2.Zero)
+                {
+                    collision.Velocity = speed * Vector2.Normalize(player.collision.Position - collision.Position);
+                }
+                else
+                {
+                    collision.Velocity = speed * (Vector2.Normalize(collision.Velocity) * 0.92f + Vector2.Normalize(player.collision.Position - collision.Position) * .08f);
+                }
+                */
             }
 
             bool left = false;
@@ -209,7 +240,7 @@ namespace RBGNature.Actor.Enemy
             }
 
             float bulletSpeed = .01f;
-            timeBetweenShots += elapsedTime;
+            //timeBetweenShots += elapsedTime;
             if (timeBetweenShots > 1000)
             {
                 timeBetweenShots = 0;

@@ -123,6 +123,9 @@ namespace RBGNature.Physics
             // Collide with IJ translated by the normal of the circle's radius in length
             Vector2 IJ = J - I;
             Vector2 normIJ = new Vector2(IJ.Y, -IJ.X); //negate the Y value because the edge runs clockwise
+
+            if (Vector2.Dot(normIJ, MN) > 0) { return CollisionResult.None; } //We are moving away from the edge, so don't collide
+
             normIJ.Normalize();
             Vector2 scaledNormIJ = normIJ * circle.Radius;
             Vector2 P = I + scaledNormIJ;
@@ -148,14 +151,14 @@ namespace RBGNature.Physics
             if (first == CircleEdgeCollision.Edge)
             {
                 t = timeOfEdgeIntersection;
-                Vector2 newCirclePos = M + (float)t * MN - 1f * normMN; //Separation of .5 unit
+                Vector2 newCirclePos = M + (float)t * MN - 0 * normMN; //Separation of .5 unit
                 Vector2 newCircleVel = (2 * Vector2.Dot(normIJ, negNormMN) * normIJ - negNormMN) * circle.Velocity.Length();
                 return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, newCircleVel);
             }
             else
             {
                 t = timeOfCornerIntersection;
-                Vector2 newCirclePos = M + (float)t * MN - 1f * normMN; //Separation of .5 unit
+                Vector2 newCirclePos = M + (float)t * MN - 0 * normMN; //Separation of .5 unit
                 Vector2 newCircleVel = Vector2.Normalize(newCirclePos - I) * circle.Velocity.Length();
                 return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, newCircleVel);
             }

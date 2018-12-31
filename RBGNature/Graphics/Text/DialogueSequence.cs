@@ -25,6 +25,14 @@ namespace RBGNature.Graphics.Text
             }
         } 
 
+        public PlateType Plate
+        {
+            get
+            {
+                return Bites[Current].Plate;
+            }
+        }
+
         public DialogueSequence()
         {
             Bites = new List<DialogueBite>();
