@@ -142,7 +142,7 @@ namespace RBGNature.Actor
         }
 
         /* Monet: Added to track what input direction was last pressed to play correct idle animation */
-        Keys lastInputDirection = new Keys();
+        FourDirectionAnimation lastInputDirection = FourDirectionAnimation.Front;
         /* Monet: Added to track if the game has played the run stop animation yet */
         Boolean playedRunStopAnimation = false;
         float runStopAnimationFrameTime = 200;
@@ -168,30 +168,11 @@ namespace RBGNature.Actor
             Vector2 inputVelocity = Vector2.Zero;
 
             /* Monet: Added to play the idle animation */
-            FourDirectionAnimation selectedKeyPress = new FourDirectionAnimation();
-            switch (lastInputDirection)
-            {
-                case Keys.W:
-                    selectedKeyPress = FourDirectionAnimation.Back;
-                    break;
-                case Keys.A:
-                    selectedKeyPress = FourDirectionAnimation.Left;
-                    break;
-                case Keys.S:
-                    selectedKeyPress = FourDirectionAnimation.Front;
-                    break;
-                case Keys.D:
-                    selectedKeyPress = FourDirectionAnimation.Right;
-                    break;
-                default:
-                    selectedKeyPress = FourDirectionAnimation.Front;
-                    break;
-            }
             if (playedRunStopAnimation)
-                animator.Set(animDict_Idle[selectedKeyPress]);
+                animator.Set(animDict_Idle[lastInputDirection]);
             else
             {
-                animator.Set(animDict_RunStop[selectedKeyPress]);
+                animator.Set(animDict_RunStop[lastInputDirection]);
                 runStopAnimationFrameTime -= elapsedTime;
                 if (runStopAnimationFrameTime <= 0)
                 {
@@ -204,25 +185,25 @@ namespace RBGNature.Actor
             {
                 inputVelocity.Y -= 1;
                 animator.Set(animDict_Run[FourDirectionAnimation.Back]);
-                lastInputDirection = Keys.W;
+                lastInputDirection = FourDirectionAnimation.Back;
             }
             if (kstate.IsKeyDown(Keys.A))
             {
                 inputVelocity.X -= 1;
                 animator.Set(animDict_Run[FourDirectionAnimation.Left]);
-                lastInputDirection = Keys.A;
+                lastInputDirection = FourDirectionAnimation.Left;
             }
             if (kstate.IsKeyDown(Keys.S))
             {
                 inputVelocity.Y += 1;
                 animator.Set(animDict_Run[FourDirectionAnimation.Front]);
-                lastInputDirection = Keys.S;
+                lastInputDirection = FourDirectionAnimation.Front;
             }
             if (kstate.IsKeyDown(Keys.D))
             {
                 inputVelocity.X += 1;
                 animator.Set(animDict_Run[FourDirectionAnimation.Right]);
-                lastInputDirection = Keys.D;
+                lastInputDirection = FourDirectionAnimation.Right;
             }
 
             if (inputVelocity == Vector2.Zero)
