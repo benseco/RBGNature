@@ -12,13 +12,6 @@ namespace RBGNature.Actor
 {
     class Player : IAct, ICollide
     {
-        enum RunAnimation
-        {
-            Front,
-            Back,
-            Left,
-            Right
-        }
         enum FourDirectionAnimation
         {
             Front,
@@ -30,7 +23,7 @@ namespace RBGNature.Actor
         static readonly Rectangle RectBulletDefault = new Rectangle(0, 0, 6, 6);
         static readonly Rectangle RectBulletCannon = new Rectangle(6, 0, 9, 9);
 
-        static AnimationDictionary<RunAnimation> animDict_Run;
+        static AnimationDictionary<FourDirectionAnimation> animDict_Run;
         static AnimationDictionary<FourDirectionAnimation> animDict_Idle;
         static AnimationDictionary<FourDirectionAnimation> animDict_RunStop;
 
@@ -92,11 +85,11 @@ namespace RBGNature.Actor
 
         static Player()
         {
-            animDict_Run = new AnimationDictionary<RunAnimation>();
-            animDict_Run[RunAnimation.Front] = new Animation("Sprites/mc/mc_run_front", 100, 8, 14, 38);
-            animDict_Run[RunAnimation.Back] = new Animation("Sprites/mc/mc_run_back", 100, 8, 14, 38);
-            animDict_Run[RunAnimation.Left] = new Animation("Sprites/mc/mc_run_left", 100, 8, 20, 36);
-            animDict_Run[RunAnimation.Right] = new Animation("Sprites/mc/mc_run_right", 100, 8, 20, 36);
+            animDict_Run = new AnimationDictionary<FourDirectionAnimation>();
+            animDict_Run[FourDirectionAnimation.Front] = new Animation("Sprites/mc/mc_run_front", 100, 8, 14, 38);
+            animDict_Run[FourDirectionAnimation.Back] = new Animation("Sprites/mc/mc_run_back", 100, 8, 14, 38);
+            animDict_Run[FourDirectionAnimation.Left] = new Animation("Sprites/mc/mc_run_left", 100, 8, 20, 36);
+            animDict_Run[FourDirectionAnimation.Right] = new Animation("Sprites/mc/mc_run_right", 100, 8, 20, 36);
 
             animDict_Idle = new AnimationDictionary<FourDirectionAnimation>();
             animDict_Idle[FourDirectionAnimation.Front] = new Animation("Sprites/mc/mc_idle_front", 100, 10, 14, 38);
@@ -169,115 +162,67 @@ namespace RBGNature.Actor
             else
             {
                 collision.Position += collision.Velocity * elapsedTime;
-
             }
-
-
+            
             float speed = .2f;
             Vector2 inputVelocity = Vector2.Zero;
 
             /* Monet: Added to play the idle animation */
+            FourDirectionAnimation selectedKeyPress = new FourDirectionAnimation();
             switch (lastInputDirection)
             {
                 case Keys.W:
-                    if (playedRunStopAnimation)
-                        animator.Set(animDict_Idle[FourDirectionAnimation.Back]);
-                    else
-                    {
-                        animator.Set(animDict_RunStop[FourDirectionAnimation.Back]);
-                        runStopAnimationFrameTime -= elapsedTime;
-                        if (runStopAnimationFrameTime <= 0)
-                        {
-                            playedRunStopAnimation = true;
-                            runStopAnimationFrameTime = 200;
-                        }
-                    }
+                    selectedKeyPress = FourDirectionAnimation.Back;
                     break;
                 case Keys.A:
-                    if (playedRunStopAnimation)
-                        animator.Set(animDict_Idle[FourDirectionAnimation.Left]);
-                    else
-                    {
-                        animator.Set(animDict_RunStop[FourDirectionAnimation.Left]);
-                        runStopAnimationFrameTime -= elapsedTime;
-                        if (runStopAnimationFrameTime <= 0)
-                        {
-                            playedRunStopAnimation = true;
-                            runStopAnimationFrameTime = 200;
-                        }
-                    }
+                    selectedKeyPress = FourDirectionAnimation.Left;
                     break;
                 case Keys.S:
-                    if (playedRunStopAnimation)
-                        animator.Set(animDict_Idle[FourDirectionAnimation.Front]);
-                    else
-                    {
-                        animator.Set(animDict_RunStop[FourDirectionAnimation.Front]);
-                        runStopAnimationFrameTime -= elapsedTime;
-                        if (runStopAnimationFrameTime <= 0)
-                        {
-                            playedRunStopAnimation = true;
-                            runStopAnimationFrameTime = 200;
-                        }
-                    }
+                    selectedKeyPress = FourDirectionAnimation.Front;
                     break;
                 case Keys.D:
-                    if (playedRunStopAnimation)
-                        animator.Set(animDict_Idle[FourDirectionAnimation.Right]);
-                    else
-                    {
-                        animator.Set(animDict_RunStop[FourDirectionAnimation.Right]);
-                        runStopAnimationFrameTime -= elapsedTime;
-                        if (runStopAnimationFrameTime <= 0)
-                        {
-                            playedRunStopAnimation = true;
-                            runStopAnimationFrameTime = 200;
-                        }
-                    }
+                    selectedKeyPress = FourDirectionAnimation.Right;
                     break;
                 default:
-                    if (playedRunStopAnimation)
-                        animator.Set(animDict_Idle[FourDirectionAnimation.Front]);
-                    else
-                    {
-                        animator.Set(animDict_RunStop[FourDirectionAnimation.Front]);
-                        runStopAnimationFrameTime -= elapsedTime;
-                        if (runStopAnimationFrameTime <= 0)
-                        {
-                            playedRunStopAnimation = true;
-                            runStopAnimationFrameTime = 200;
-                        }
-                    }
+                    selectedKeyPress = FourDirectionAnimation.Front;
                     break;
+            }
+            if (playedRunStopAnimation)
+                animator.Set(animDict_Idle[selectedKeyPress]);
+            else
+            {
+                animator.Set(animDict_RunStop[selectedKeyPress]);
+                runStopAnimationFrameTime -= elapsedTime;
+                if (runStopAnimationFrameTime <= 0)
+                {
+                    playedRunStopAnimation = true;
+                    runStopAnimationFrameTime = 200;
+                }
             }
 
             if (kstate.IsKeyDown(Keys.W))
             {
                 inputVelocity.Y -= 1;
-                animator.Set(animDict_Run[RunAnimation.Back]);
+                animator.Set(animDict_Run[FourDirectionAnimation.Back]);
                 lastInputDirection = Keys.W;
-                playedRunStopAnimation = false;
             }
             if (kstate.IsKeyDown(Keys.A))
             {
                 inputVelocity.X -= 1;
-                animator.Set(animDict_Run[RunAnimation.Left]);
+                animator.Set(animDict_Run[FourDirectionAnimation.Left]);
                 lastInputDirection = Keys.A;
-                playedRunStopAnimation = false;
             }
             if (kstate.IsKeyDown(Keys.S))
             {
                 inputVelocity.Y += 1;
-                animator.Set(animDict_Run[RunAnimation.Front]);
+                animator.Set(animDict_Run[FourDirectionAnimation.Front]);
                 lastInputDirection = Keys.S;
-                playedRunStopAnimation = false;
             }
             if (kstate.IsKeyDown(Keys.D))
             {
                 inputVelocity.X += 1;
-                animator.Set(animDict_Run[RunAnimation.Right]);
+                animator.Set(animDict_Run[FourDirectionAnimation.Right]);
                 lastInputDirection = Keys.D;
-                playedRunStopAnimation = false;
             }
 
             if (inputVelocity == Vector2.Zero)
@@ -294,6 +239,7 @@ namespace RBGNature.Actor
             }
             else
             {
+                playedRunStopAnimation = false;
                 if (inputVelocity.X != 0 && inputVelocity.Y != 0) { inputVelocity.Normalize(); } //TODO: Performance?
 
                 Vector2 newDirection;
