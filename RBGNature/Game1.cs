@@ -159,7 +159,7 @@ namespace RBGNature
         {
             double currentFrameTime = gameTime.ElapsedGameTime.TotalSeconds;
 
-            System.Console.WriteLine("FPS:" + 1 / currentFrameTime + " | " + updateCount);
+            //System.Console.WriteLine("FPS:" + 1 / currentFrameTime + " | " + updateCount);
             updateCount = 0;
 
             if (currentFrameTime > previousFrameTime)

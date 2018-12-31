@@ -19,11 +19,21 @@ namespace RBGNature.Actor
             Left,
             Right
         }
-        
+        enum FourDirectionAnimation
+        {
+            Front,
+            Back,
+            Left,
+            Right
+        }
+
         static readonly Rectangle RectBulletDefault = new Rectangle(0, 0, 6, 6);
         static readonly Rectangle RectBulletCannon = new Rectangle(6, 0, 9, 9);
 
         static AnimationDictionary<RunAnimation> animDict_Run;
+        static AnimationDictionary<FourDirectionAnimation> animDict_Idle;
+        static AnimationDictionary<FourDirectionAnimation> animDict_RunStop;
+
 
         static CollisionIdentity bulletIdentity = new CollisionIdentity()
         {
@@ -87,6 +97,18 @@ namespace RBGNature.Actor
             animDict_Run[RunAnimation.Back] = new Animation("Sprites/mc/mc_run_back", 100, 8, 14, 38);
             animDict_Run[RunAnimation.Left] = new Animation("Sprites/mc/mc_run_left", 100, 8, 20, 36);
             animDict_Run[RunAnimation.Right] = new Animation("Sprites/mc/mc_run_right", 100, 8, 20, 36);
+
+            animDict_Idle = new AnimationDictionary<FourDirectionAnimation>();
+            animDict_Idle[FourDirectionAnimation.Front] = new Animation("Sprites/mc/mc_idle_front", 100, 10, 14, 38);
+            animDict_Idle[FourDirectionAnimation.Back] = new Animation("Sprites/mc/mc_idle_back", 100, 10, 14, 38);
+            animDict_Idle[FourDirectionAnimation.Left] = new Animation("Sprites/mc/mc_idle_left", 100, 10, 12, 32);
+            animDict_Idle[FourDirectionAnimation.Right] = new Animation("Sprites/mc/mc_idle_right", 100, 10, 12, 32);
+
+            animDict_RunStop = new AnimationDictionary<FourDirectionAnimation>();
+            animDict_RunStop[FourDirectionAnimation.Front] = new Animation("Sprites/mc/mc_stop_run_front", 100, 2, 14, 38);
+            animDict_RunStop[FourDirectionAnimation.Back] = new Animation("Sprites/mc/mc_stop_run_back", 100, 2, 14, 38);
+            animDict_RunStop[FourDirectionAnimation.Left] = new Animation("Sprites/mc/mc_stop_run_left", 100, 2, 12, 31);
+            animDict_RunStop[FourDirectionAnimation.Right] = new Animation("Sprites/mc/mc_stop_run_right", 100, 2, 12, 31);
         }
 
         public Player(Camera camera)
@@ -104,12 +126,14 @@ namespace RBGNature.Actor
             };
             collisionResult = CollisionResult.None;
             CurrentHealth = MaxHealth;
-            animator = new Animator(animDict_Run[RunAnimation.Front]);
+            animator = new Animator(animDict_Idle[FourDirectionAnimation.Front]);
         }
 
         public void LoadContent(ContentManager contentManager)
         {
             animDict_Run.Load(contentManager);
+            animDict_Idle.Load(contentManager);
+            animDict_RunStop.Load(contentManager);
 
             textureMan = contentManager.Load<Texture2D>("Sprites/mc/front");
             textureBullet = contentManager.Load<Texture2D>("Sprites/bullet/bullet");
@@ -124,10 +148,16 @@ namespace RBGNature.Actor
             soundEffectRhythmClick = contentManager.Load<SoundEffect>("Sound/effect/metronome");
         }
 
+        /* Monet: Added to track what input direction was last pressed to play correct idle animation */
+        Keys lastInputDirection = new Keys();
+        /* Monet: Added to track if the game has played the run stop animation yet */
+        Boolean playedRunStopAnimation = false;
+        float runStopAnimationFrameTime = 200;
+
         public void Update(GameTime gameTime)
         {
             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            System.Console.WriteLine(collision.Velocity);
+            //System.Console.WriteLine("Elapsed Time = " + elapsedTime);
             var kstate = Keyboard.GetState();
             if (collisionResult)
             {
@@ -146,28 +176,108 @@ namespace RBGNature.Actor
             float speed = .2f;
             Vector2 inputVelocity = Vector2.Zero;
 
+            /* Monet: Added to play the idle animation */
+            switch (lastInputDirection)
+            {
+                case Keys.W:
+                    if (playedRunStopAnimation)
+                        animator.Set(animDict_Idle[FourDirectionAnimation.Back]);
+                    else
+                    {
+                        animator.Set(animDict_RunStop[FourDirectionAnimation.Back]);
+                        runStopAnimationFrameTime -= elapsedTime;
+                        if (runStopAnimationFrameTime <= 0)
+                        {
+                            playedRunStopAnimation = true;
+                            runStopAnimationFrameTime = 200;
+                        }
+                    }
+                    break;
+                case Keys.A:
+                    if (playedRunStopAnimation)
+                        animator.Set(animDict_Idle[FourDirectionAnimation.Left]);
+                    else
+                    {
+                        animator.Set(animDict_RunStop[FourDirectionAnimation.Left]);
+                        runStopAnimationFrameTime -= elapsedTime;
+                        if (runStopAnimationFrameTime <= 0)
+                        {
+                            playedRunStopAnimation = true;
+                            runStopAnimationFrameTime = 200;
+                        }
+                    }
+                    break;
+                case Keys.S:
+                    if (playedRunStopAnimation)
+                        animator.Set(animDict_Idle[FourDirectionAnimation.Front]);
+                    else
+                    {
+                        animator.Set(animDict_RunStop[FourDirectionAnimation.Front]);
+                        runStopAnimationFrameTime -= elapsedTime;
+                        if (runStopAnimationFrameTime <= 0)
+                        {
+                            playedRunStopAnimation = true;
+                            runStopAnimationFrameTime = 200;
+                        }
+                    }
+                    break;
+                case Keys.D:
+                    if (playedRunStopAnimation)
+                        animator.Set(animDict_Idle[FourDirectionAnimation.Right]);
+                    else
+                    {
+                        animator.Set(animDict_RunStop[FourDirectionAnimation.Right]);
+                        runStopAnimationFrameTime -= elapsedTime;
+                        if (runStopAnimationFrameTime <= 0)
+                        {
+                            playedRunStopAnimation = true;
+                            runStopAnimationFrameTime = 200;
+                        }
+                    }
+                    break;
+                default:
+                    if (playedRunStopAnimation)
+                        animator.Set(animDict_Idle[FourDirectionAnimation.Front]);
+                    else
+                    {
+                        animator.Set(animDict_RunStop[FourDirectionAnimation.Front]);
+                        runStopAnimationFrameTime -= elapsedTime;
+                        if (runStopAnimationFrameTime <= 0)
+                        {
+                            playedRunStopAnimation = true;
+                            runStopAnimationFrameTime = 200;
+                        }
+                    }
+                    break;
+            }
+
             if (kstate.IsKeyDown(Keys.W))
             {
                 inputVelocity.Y -= 1;
                 animator.Set(animDict_Run[RunAnimation.Back]);
+                lastInputDirection = Keys.W;
+                playedRunStopAnimation = false;
             }
-
-            if (kstate.IsKeyDown(Keys.S))
-            {
-                inputVelocity.Y += 1;
-                animator.Set(animDict_Run[RunAnimation.Front]);
-            }
-
             if (kstate.IsKeyDown(Keys.A))
             {
                 inputVelocity.X -= 1;
                 animator.Set(animDict_Run[RunAnimation.Left]);
+                lastInputDirection = Keys.A;
+                playedRunStopAnimation = false;
             }
-
+            if (kstate.IsKeyDown(Keys.S))
+            {
+                inputVelocity.Y += 1;
+                animator.Set(animDict_Run[RunAnimation.Front]);
+                lastInputDirection = Keys.S;
+                playedRunStopAnimation = false;
+            }
             if (kstate.IsKeyDown(Keys.D))
             {
                 inputVelocity.X += 1;
                 animator.Set(animDict_Run[RunAnimation.Right]);
+                lastInputDirection = Keys.D;
+                playedRunStopAnimation = false;
             }
 
             if (inputVelocity == Vector2.Zero)
