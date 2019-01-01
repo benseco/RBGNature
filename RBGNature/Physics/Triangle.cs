@@ -123,17 +123,19 @@ namespace RBGNature.Physics
             // Collide with IJ translated by the normal of the circle's radius in length
             Vector2 IJ = J - I;
             Vector2 normIJ = new Vector2(IJ.Y, -IJ.X); //negate the Y value because the edge runs clockwise
-
-            if (Vector2.Dot(normIJ, MN) > 0) { return CollisionResult.None; } //We are moving away from the edge, so don't collide
-
             normIJ.Normalize();
-            Vector2 scaledNormIJ = normIJ * circle.Radius;
-            Vector2 P = I + scaledNormIJ;
-            Vector2 Q = J + scaledNormIJ;
 
             double timeOfEdgeIntersection = -1;
-            bool intersectsEdge = PhysicsObject.TimeOfIntersection(M, N, P, Q, out timeOfEdgeIntersection, out double u);
-            if (!intersectsEdge || u < 0 || u > 1) timeOfEdgeIntersection = -1; // Invalid intersections
+            if (Vector2.Dot(normIJ, MN) <= 0) // Only collide edge if we are moving toward it
+            {
+                Vector2 scaledNormIJ = normIJ * circle.Radius;
+                Vector2 P = I + scaledNormIJ;
+                Vector2 Q = J + scaledNormIJ;
+
+                timeOfEdgeIntersection = -1;
+                bool intersectsEdge = PhysicsObject.TimeOfIntersection(M, N, P, Q, out timeOfEdgeIntersection, out double u);
+                if (!intersectsEdge || u < 0 || u > 1) timeOfEdgeIntersection = -1; // Invalid intersections
+            }
 
             // Collide circle as point with a new circle with center I and the same radius as circle (corner circle)
             //TODO: we shouldn't create an object every time - create a struct circle representation or equivalent method
