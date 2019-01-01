@@ -83,7 +83,12 @@ namespace RBGNature.Physics
             // Calculate the intermediate fractional point that the lines potentially intersect.
             tv = nv / d;
             tw = nw / d;
-            
+
+            if (Math.Round(tv, 3) == 0) tv = 0;
+            if (Math.Round(tw, 3) == 0) tw = 0;
+            if (Math.Round(tv, 3) == 1) tv = 1;
+            if (Math.Round(tw, 3) == 1) tw = 1;
+
             return true;
 
         }

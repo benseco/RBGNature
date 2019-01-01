@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,6 +61,7 @@ namespace RBGNature.Physics
                     
                     for (int k = 0; k < 4; k++) //subtriangle
                     {
+                        //Trace.Write(array[i, j, k] + ",");
                         if (array[i, j, k] != 1) continue; //triangle does not collide
                         
                         CollisionResult result = GetTriangle(i, j, k).CollideCircleAtTime(s, c, out double cTime);
@@ -70,7 +72,9 @@ namespace RBGNature.Physics
                             first = result;
                         }
                     }
+                    //Trace.Write(" ");
                 }
+                //Trace.WriteLine("");
             }
 
             return first;

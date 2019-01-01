@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Physics
 {
-    class PhysicsGroup
+    public class PhysicsGroup
     {
         private List<ICollide> group;
         private PhysicsGroupType groupType;
@@ -40,7 +40,7 @@ namespace RBGNature.Physics
         }
     }
 
-    enum PhysicsGroupType
+    public enum PhysicsGroupType
     {
         Physical,
         EnemyFire,

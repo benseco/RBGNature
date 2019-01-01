@@ -2,7 +2,7 @@
 
 namespace RBGNature.Physics
 {
-    interface ICollide
+    public interface ICollide
     {
         void Collide(float s, PhysicsGroupType groupType, ICollide other);
         CollisionResult Collide(float s, PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity);

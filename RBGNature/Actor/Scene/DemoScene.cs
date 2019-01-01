@@ -38,7 +38,8 @@ namespace RBGNature.Actor.Scene
             map = new DemoMap();
             player = new Player(Camera);
             TestEnemy enemy = new TestEnemy(new Vector2(200, 600), player);
-            WalkingEnemy enemy2 = new WalkingEnemy(new Vector2(295, 365), player);
+            //WalkingEnemy enemy2 = new WalkingEnemy(new Vector2(295, 365), player);
+            WalkingEnemy enemy2 = new WalkingEnemy(new Vector2(250, 400), player);
             Item item = new Item(player, new Vector2(100, 500));
             children.Add(map);
             children.Add(player);

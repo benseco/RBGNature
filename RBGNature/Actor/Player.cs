@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace RBGNature.Actor
 {
-    class Player : IAct, ICollide
+    public class Player : IAct, ICollide
     {
         enum FourDirectionAnimation
         {
@@ -157,6 +157,7 @@ namespace RBGNature.Actor
             float elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             //System.Console.WriteLine("Elapsed Time = " + elapsedTime);
             var kstate = Keyboard.GetState();
+            CollisionResult old = collisionResult;
             if (collisionResult)
             {
                 // If we had a collision, start over with the collision result
@@ -356,7 +357,7 @@ namespace RBGNature.Actor
             }
             spriteBatch.Draw(animator.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(), tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
 
-            //spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             //spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureHPBar, collision.Position - new Vector2(0, 50), getHealthSpriteRect(), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
 

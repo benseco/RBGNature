@@ -18,6 +18,8 @@ namespace RBGNature.Physics
 
         public CollisionResult CollideCircleAtTime(float s, Circle c, out double t)
         {
+            return CollideCircleAtTime2(s, c, out t);
+
             t = -1;//arbitrary error case
 
             Vector2 vel = Velocity * s - c.Velocity * s;
@@ -82,6 +84,104 @@ namespace RBGNature.Physics
             else return CollisionResult.None;
         }
 
+        public CollisionResult CollideCircleAtTime2(float s, Circle other, out double t)
+        {
+            t = -1; //error case
+
+            //Change frame of reference to this circle
+            Vector2 vel = other.Velocity * s - this.Velocity * s;
+            Vector2 pos = other.Position - this.Position;
+
+            //Now assume the following about this circle:
+            //Radius = this.Radius + other.Radius
+            //Position = Vector2.Zero
+            //Velocity = Vector2.Zero
+
+            //This circle is colliding with a point:
+            //Position = pos
+            //Velocity = vel
+
+            Vector2 d = vel; //Ray from start to end
+            Vector2 f = pos; //Vector from this circle center to ray start
+
+            float r = Radius + other.Radius;
+
+            float a = Vector2.Dot(d, d);
+            float b = Vector2.Dot(f, d) * 2;
+            float c = Vector2.Dot(f, f) - r * r;
+
+            float discriminant = b * b - 4 * a * c;
+            if (discriminant < 0)
+            {
+                // no intersection
+                return CollisionResult.None;
+            }
+
+            // ray didn't totally miss sphere,
+            // so there is a solution to
+            // the equation.
+
+            discriminant = (float)Math.Sqrt(discriminant);
+
+            // either solution may be on or off the ray so need to test both
+            // t1 is always the smaller value, because BOTH discriminant and
+            // a are nonnegative.
+            float t1 = (-b - discriminant) / (2 * a);
+            float t2 = (-b + discriminant) / (2 * a);
+
+            if (Math.Round(t1, 3) == 0) t1 = 0;
+            if (Math.Round(t2, 3) == 0) t2 = 0;
+            if (Math.Round(t1, 3) == 1) t1 = 1;
+            if (Math.Round(t2, 3) == 1) t2 = 1;
+
+            // 3x HIT cases:
+            //          -o->             --|-->  |            |  --|->
+            // Impale(t1 hit,t2 hit), Poke(t1 hit,t2>1), ExitWound(t1<0, t2 hit), 
+
+            // 3x MISS cases:
+            //       ->  o                     o ->              | -> |
+            // FallShort (t1>1,t2>1), Past (t1<0,t2<0), CompletelyInside(t1<0, t2>1)
+
+            if (t1 >= 0 && t1 <= 1)
+            {
+                // t1 is the intersection, and it's closer than t2
+                // (since t1 uses -b - discriminant)
+                // Impale, Poke
+                t = t1;
+
+                // The position of the circles at time of collision
+                Vector2 newPos = Position + Velocity * s * (float)t;
+                Vector2 cNewPos = other.Position + other.Velocity * s * (float)t;
+
+                // Calculate response (bounce)
+                // The norm of the vector between the two circles
+                Vector2 n = Vector2.Normalize(cNewPos - newPos);
+
+                //impulse magnitude?
+                Vector2 deltaV = Velocity - other.Velocity;
+                float magnitude = deltaV.Length();
+
+                //Resultant velocities
+                Vector2 newV = Velocity - (1 / Mass) * magnitude * n;
+                Vector2 cNewV = other.Velocity + (1 / other.Mass) * magnitude * n;
+
+                return new CollisionResult(newPos, newV, cNewPos, cNewV);
+            }
+
+            // here t1 didn't intersect so we are either started
+            // inside the sphere or completely past it
+            if (t2 >= 0 && t2 <= 1)
+            {
+                // ExitWound
+                //Since we are exiting the circle, don't collide
+                System.Console.WriteLine("Exit Wound Occured");
+                return CollisionResult.None;
+            }
+
+            // no intn: FallShort, Past, CompletelyInside
+            return CollisionResult.None;
+        }
+
         public override CollisionResult Collide(float s, TriArray triArray)
         {
             //Implemented in TriArray.cs
@@ -109,7 +209,7 @@ namespace RBGNature.Physics
         //    }
 
         //    Vector2 projection = a + p;
-            
+
         //    //check collision
         //    if (Intersects(projection) && p.LengthSquared() <= dLen2 && Vector2.Dot(p, d) >= 0)
         //    {
