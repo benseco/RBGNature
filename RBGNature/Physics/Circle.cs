@@ -106,6 +106,16 @@ namespace RBGNature.Physics
 
             float r = Radius + other.Radius;
 
+            // If our circles are overlapping for whatever reason, encourage separation
+            float distanceSquared = Vector2.DistanceSquared(Position, other.Position);
+            if (distanceSquared < r * r && Vector2.DistanceSquared(Position + Velocity, other.Position + other.Velocity) < distanceSquared)
+            {
+                float massRatio = Mass / (Mass + other.Mass);
+                Vector2 newVel = -pos * (1-massRatio) / s;
+                Vector2 cNewVel = pos * (massRatio) / s;
+                return new CollisionResult(Position, newVel, other.Position, cNewVel);
+            }
+
             float a = Vector2.Dot(d, d);
             float b = Vector2.Dot(f, d) * 2;
             float c = Vector2.Dot(f, f) - r * r;
@@ -129,10 +139,10 @@ namespace RBGNature.Physics
             float t1 = (-b - discriminant) / (2 * a);
             float t2 = (-b + discriminant) / (2 * a);
 
-            if (Math.Round(t1, 3) == 0) t1 = 0;
-            if (Math.Round(t2, 3) == 0) t2 = 0;
-            if (Math.Round(t1, 3) == 1) t1 = 1;
-            if (Math.Round(t2, 3) == 1) t2 = 1;
+            //if (Math.Round(t1, 2) == 0) t1 = 0;
+            //if (Math.Round(t2, 2) == 0) t2 = 0;
+            //if (Math.Round(t1, 2) == 1) t1 = 1;
+            //if (Math.Round(t2, 2) == 1) t2 = 1;
 
             // 3x HIT cases:
             //          -o->             --|-->  |            |  --|->
@@ -150,8 +160,8 @@ namespace RBGNature.Physics
                 t = t1;
 
                 // The position of the circles at time of collision
-                Vector2 newPos = Position + Velocity * s * (float)t;
-                Vector2 cNewPos = other.Position + other.Velocity * s * (float)t;
+                Vector2 newPos = Position + Velocity * s * (float)(t - .005);
+                Vector2 cNewPos = other.Position + other.Velocity * s * (float)(t - .005);
 
                 // Calculate response (bounce)
                 // The norm of the vector between the two circles
@@ -164,7 +174,7 @@ namespace RBGNature.Physics
                 //Resultant velocities
                 Vector2 newV = Velocity - (1 / Mass) * magnitude * n;
                 Vector2 cNewV = other.Velocity + (1 / other.Mass) * magnitude * n;
-
+                
                 return new CollisionResult(newPos, newV, cNewPos, cNewV);
             }
 
@@ -174,7 +184,6 @@ namespace RBGNature.Physics
             {
                 // ExitWound
                 //Since we are exiting the circle, don't collide
-                System.Console.WriteLine("Exit Wound Occured");
                 return CollisionResult.None;
             }
 

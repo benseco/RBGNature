@@ -24,7 +24,7 @@ namespace RBGNature.Actor.Enemy
         static AnimationDictionary<WalkAnimation> animDict_Walk;
 
 
-        Circle collision;
+        public Circle collision;
         Texture2D textureFront;
         Texture2D textureCircle10;
         Texture2D textureBullet;
@@ -56,7 +56,7 @@ namespace RBGNature.Actor.Enemy
                 Position = position,
                 Velocity = Vector2.Zero,
                 Radius = 10,
-                Mass = 1
+                Mass = 10
             };
             this.player = player;
             bullets = new List<Circle>();

@@ -21,8 +21,8 @@ namespace RBGNature.Actor
 
         public void Update(GameTime gameTime)
         {
-            children.ForEach(s => s.Update(gameTime));
             this.UpdateParent(gameTime);
+            children.ForEach(s => s.Update(gameTime));
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)

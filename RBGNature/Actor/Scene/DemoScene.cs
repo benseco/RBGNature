@@ -20,7 +20,7 @@ namespace RBGNature.Actor.Scene
 
         DemoMap map;
         Player player;
-
+        WalkingEnemy enemy2;
         PhysicsGroup physical;
 
         FragmentWriter writer;
@@ -38,8 +38,8 @@ namespace RBGNature.Actor.Scene
             map = new DemoMap();
             player = new Player(Camera);
             TestEnemy enemy = new TestEnemy(new Vector2(200, 600), player);
-            //WalkingEnemy enemy2 = new WalkingEnemy(new Vector2(295, 365), player);
-            WalkingEnemy enemy2 = new WalkingEnemy(new Vector2(250, 400), player);
+            enemy2 = new WalkingEnemy(new Vector2(295, 365), player);
+            //enemy2 = new WalkingEnemy(new Vector2(250, 400), player);
             Item item = new Item(player, new Vector2(100, 500));
             children.Add(map);
             children.Add(player);
@@ -56,7 +56,6 @@ namespace RBGNature.Actor.Scene
             writer = new FragmentWriter("Fonts/TooMuchInk", new Rectangle(100, 450, 200, 200), Color.White);
             writer.SetText(Fragment.Parse(example));
         }
-
         public override bool Dead()
         {
             return false;
@@ -83,7 +82,6 @@ namespace RBGNature.Actor.Scene
             writer.Update(gameTime);
             Dialogue.Update(gameTime);
 
-            physical.Collide((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             for (int i = children.Count - 1; i >= 0; i--)
             {
                 if (children[i].Dead())
@@ -92,6 +90,8 @@ namespace RBGNature.Actor.Scene
                     children.RemoveAt(i);
                 }
             }
+
+            physical.Collide((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
             Color color = Color.Black;
             float lengthOfDay = 12000;
