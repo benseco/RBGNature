@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using RBGNature.Actor.Enemy;
 using RBGNature.Actor.Interactible;
 using RBGNature.Actor.Map;
@@ -25,7 +26,20 @@ namespace RBGNature.Actor.Scene
 
         FragmentWriter writer;
 
-        public DemoScene()
+        private static DemoScene _instance;
+        public static DemoScene Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new DemoScene();
+                }
+                return _instance;
+            }
+        }
+
+        private DemoScene()
         {
             // set up camera
             Camera = new Camera
@@ -56,9 +70,9 @@ namespace RBGNature.Actor.Scene
             writer = new FragmentWriter("Fonts/TooMuchInk", new Rectangle(100, 450, 200, 200), Color.White);
             writer.SetText(Fragment.Parse(example));
         }
-        public override bool Dead()
+
+        public override void Regenerate()
         {
-            return false;
         }
 
         public override void DrawParent(GameTime gameTime, SpriteBatch spriteBatch)
@@ -92,6 +106,12 @@ namespace RBGNature.Actor.Scene
             }
 
             physical.Collide((float)gameTime.ElapsedGameTime.TotalMilliseconds);
+
+            var kstate = Keyboard.GetState();
+            if (kstate.IsKeyDown(Keys.V))
+            {
+                NextScene = DemoScene2.Instance;
+            }
 
             Color color = Color.Black;
             float lengthOfDay = 12000;

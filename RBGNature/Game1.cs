@@ -16,7 +16,7 @@ namespace RBGNature
         SpriteBatch spriteBatch;
         RenderTarget2D renderTarget;
         RenderTarget2D lightTarget;
-        BaseScene scene;
+        SceneManager sceneManager;
 
         private static bool Paused { get; set; }
         private static bool JustPaused { get; set; }
@@ -91,7 +91,7 @@ namespace RBGNature
             lightTarget = new RenderTarget2D(graphics.GraphicsDevice, 640, 360, false, SurfaceFormat.Color,
                 DepthFormat.None, presentationParameters.MultiSampleCount, RenderTargetUsage.DiscardContents);
 
-            scene = new DemoScene();
+            sceneManager = new SceneManager(DemoScene.Instance);
 
 
             this.IsMouseVisible = true;
@@ -109,7 +109,7 @@ namespace RBGNature
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            scene.LoadContent(Content);
+            sceneManager.LoadContent(Content);
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace RBGNature
             if (Paused) return;
 
             // TODO: Add your update logic here
-            scene.Update(gameTime);
+            sceneManager.Update(gameTime);
 
             base.Update(gameTime);
 
@@ -172,11 +172,11 @@ namespace RBGNature
 
             // Clear lightTarget with atmosphere color from scene
             GraphicsDevice.SetRenderTarget(lightTarget);
-            GraphicsDevice.Clear(scene.Atmosphere);
+            GraphicsDevice.Clear(sceneManager.Scene.Atmosphere);
 
             // Draw lights from scene onto lightTarget
-            spriteBatch.Begin(blendState: Lighten, transformMatrix: scene.Camera.GetTransform());
-            scene.Light(spriteBatch);
+            spriteBatch.Begin(blendState: Lighten, transformMatrix: sceneManager.Scene.Camera.GetTransform());
+            sceneManager.Light(spriteBatch);
             spriteBatch.End();
             
             //game
@@ -187,8 +187,8 @@ namespace RBGNature
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
 
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: scene.Camera.GetTransform(), sortMode: SpriteSortMode.FrontToBack);
-            scene.Draw(gameTime, spriteBatch);
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: sceneManager.Scene.Camera.GetTransform(), sortMode: SpriteSortMode.FrontToBack);
+            sceneManager.Draw(gameTime, spriteBatch);
             spriteBatch.End();
             
 

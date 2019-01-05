@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RBGNature.Actor
 {
-    abstract class ParentActor : IAct
+    public abstract class ParentActor : IAct
     {
         protected List<IAct> children = new List<IAct>();
 
