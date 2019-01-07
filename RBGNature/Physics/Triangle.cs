@@ -153,7 +153,7 @@ namespace RBGNature.Physics
             if (first == CircleEdgeCollision.Edge)
             {
                 t = timeOfEdgeIntersection;
-                Vector2 newCirclePos = M + (float)t * MN;
+                Vector2 newCirclePos = M + (float)t * MN + normIJ * .2f;
                 Vector2 newCircleVel = (2 * Vector2.Dot(normIJ, negNormMN) * normIJ - negNormMN) * circle.Velocity.Length();
                 return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, newCircleVel);
             }
@@ -165,6 +165,8 @@ namespace RBGNature.Physics
 
                 Vector2 newCirclePos = cornerCollisionResult.PositionA;
                 Vector2 newCircleVel = cornerCollisionResult.VelocityA;
+
+                newCirclePos += Vector2.Normalize(newCirclePos - I) * .2f;
                 return new CollisionResult(Vector2.Zero, Vector2.Zero, newCirclePos, newCircleVel);
             }
         }

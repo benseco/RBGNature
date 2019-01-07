@@ -160,7 +160,7 @@ namespace RBGNature.Physics
                 t = t1;
 
                 // The position of the circles at time of collision
-                Vector2 newPos = Position + Velocity * s * (float)(t - .005);
+                Vector2 newPos = Position + Velocity * s * (float)(t - .005); // Is the subtraction necessary?
                 Vector2 cNewPos = other.Position + other.Velocity * s * (float)(t - .005);
 
                 // Calculate response (bounce)
@@ -174,7 +174,7 @@ namespace RBGNature.Physics
                 //Resultant velocities
                 Vector2 newV = Velocity - (1 / Mass) * magnitude * n;
                 Vector2 cNewV = other.Velocity + (1 / other.Mass) * magnitude * n;
-                
+
                 return new CollisionResult(newPos, newV, cNewPos, cNewV);
             }
 
