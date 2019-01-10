@@ -43,6 +43,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Actor\Battle\PlayerWeapon.cs" />
     <Compile Include="Actor\IAct.cs" />
     <Compile Include="Actor\Enemy\WalkingEnemy.cs" />
     <Compile Include="Actor\Enemy\TestEnemy.cs" />

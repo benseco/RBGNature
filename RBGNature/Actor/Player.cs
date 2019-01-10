@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using RBGNature.Actor.Battle;
 using RBGNature.Graphics.Animate;
 using RBGNature.Physics;
 using System;
@@ -19,33 +20,16 @@ namespace RBGNature.Actor
             Left,
             Right
         }
-
-        static readonly Rectangle RectBulletDefault = new Rectangle(0, 0, 6, 6);
-        static readonly Rectangle RectBulletCannon = new Rectangle(6, 0, 9, 9);
-
         static AnimationDictionary<FourDirectionAnimation> animDict_Run;
         static AnimationDictionary<FourDirectionAnimation> animDict_Idle;
         static AnimationDictionary<FourDirectionAnimation> animDict_RunStop;
 
-
-        static CollisionIdentity bulletIdentity = new CollisionIdentity()
-        {
-            Damage = 1
-        };
-
-        static CollisionIdentity cannonballIdentity = new CollisionIdentity()
-        {
-            Damage = 5
-        };
-
         Camera camera;
         Texture2D textureMan;
-        Texture2D textureBullet;
-        Texture2D textureCannonball;
         Texture2D textureHPBar;
         Texture2D textureLight;
-        SoundEffect soundEffectGunshot;
-        SoundEffect soundEffectRhythmClick;
+        Texture2D textureCircle10;
+        Texture2D textureCircle200;
 
         public int CurrentHealth { get; private set; }
         const int MaxHealth = 15;
@@ -53,35 +37,10 @@ namespace RBGNature.Actor
         float timeBetweenDamage = 0;
         Animator animator;
 
-        List<Circle> bullets;
-        List<Circle> bulletsToRemove;
-        List<Circle> cannonballs;
-        List<Circle> cannonballsToRemove;
         public Circle collision;
         private CollisionResult collisionResult;
 
-        Texture2D textureCircle10;
-        Texture2D textureCircle200;
-
-        GunMode mode;
-        private bool canChangeMode;
-
-        private float timeBetweenShots;
-        private bool justShot;
-
-        private float shotRhythm;
-        private bool countingRhythm;
-        private bool rhythmReady;
-
-        public enum GunMode
-        {
-            Default,
-            Shotgun,
-            Sniper,
-            Cannon,
-            Turret,
-            Laser
-        }
+        public PlayerWeapon Weapon { get; set; }
 
         static Player()
         {
@@ -107,10 +66,6 @@ namespace RBGNature.Actor
         public Player(Camera camera)
         {
             this.camera = camera;
-            bullets = new List<Circle>();
-            bulletsToRemove = new List<Circle>();
-            cannonballs = new List<Circle>();
-            cannonballsToRemove = new List<Circle>();
             collision = new Circle()
             {
                 Radius = 10,
@@ -120,6 +75,7 @@ namespace RBGNature.Actor
             collisionResult = CollisionResult.None;
             CurrentHealth = MaxHealth;
             animator = new Animator(animDict_Idle[FourDirectionAnimation.Front]);
+            Weapon = new PlayerWeapon(camera);
         }
 
         public void LoadContent(ContentManager contentManager)
@@ -129,16 +85,13 @@ namespace RBGNature.Actor
             animDict_RunStop.Load(contentManager);
 
             textureMan = contentManager.Load<Texture2D>("Sprites/mc/front");
-            textureBullet = contentManager.Load<Texture2D>("Sprites/bullet/bullet");
-            textureCannonball = contentManager.Load<Texture2D>("Sprites/bullet/cannonball");
             textureCircle10 = contentManager.Load<Texture2D>("Sprites/debug/circle10");
             textureCircle200 = contentManager.Load<Texture2D>("Sprites/debug/circle200");
             textureHPBar = contentManager.Load<Texture2D>("UI/HPBar");
 
             textureLight = contentManager.Load<Texture2D>("Sprites/light/53");
 
-            soundEffectGunshot = contentManager.Load<SoundEffect>("Sound/effect/gunshot");
-            soundEffectRhythmClick = contentManager.Load<SoundEffect>("Sound/effect/metronome");
+            Weapon.LoadContent(contentManager);
         }
 
         /// <summary>
@@ -246,95 +199,7 @@ namespace RBGNature.Actor
 
             camera.MoveTo(collision.Position);
 
-            if (kstate.IsKeyDown(Keys.F))
-            {
-                if (canChangeMode)
-                {
-                    canChangeMode = false;
-                    if (mode == GunMode.Default) mode = GunMode.Cannon;
-                    else mode = GunMode.Default;
-                }
-            }
-            else { canChangeMode = true; }
-
-            //Remove any bullets that collided in the last update
-            bulletsToRemove.ForEach(b => bullets.Remove(b));
-            cannonballsToRemove.ForEach(b => cannonballs.Remove(b));
-
-            var mstate = Mouse.GetState();
-            timeBetweenShots += elapsedTime;
-            if (mstate.LeftButton == ButtonState.Pressed)
-            {
-                if (timeBetweenShots > 100 && !justShot)
-                {
-                    if (mode == GunMode.Default)
-                    {
-                        bullets.Add(new Circle()
-                        {
-                            Position = camera.Position,
-                            Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * .5f,
-                            Mass = 1,
-                            Radius = 3
-                        });
-                    }
-                    else if (mode == GunMode.Cannon)
-                    {
-                        cannonballs.Add(new Circle()
-                        {
-                            Position = camera.Position,
-                            Velocity = Vector2.Normalize(mstate.Position.ToVector2() - camera.FocalPoint) * .25f,
-                            Mass = 1,
-                            Radius = 6
-                        });
-                    }
-
-                    soundEffectGunshot.CreateInstance().Play();
-
-                    if (countingRhythm)
-                    {
-                        if (shotRhythm == 0)
-                        {
-                            shotRhythm = timeBetweenShots;
-                        }
-                        else if (Math.Abs(timeBetweenShots - shotRhythm) < 60)
-                        {
-                            rhythmReady = true;
-                        }
-                        else
-                        {
-                            rhythmReady = false;
-                            countingRhythm = false;
-                        }
-                    }
-                    else
-                    {
-                        countingRhythm = true;
-                        shotRhythm = 0;
-                    }
-
-                    timeBetweenShots = 0;
-                    justShot = true;
-                }
-            }
-            else
-            {
-                justShot = false;
-            }
-
-            if (rhythmReady && timeBetweenShots >= .5 * shotRhythm && rhythmReady)
-            {
-                soundEffectRhythmClick.CreateInstance().Play();
-                rhythmReady = false;
-            }
-
-            foreach (Circle bullet in bullets)
-            {
-                bullet.Position += bullet.Velocity * elapsedTime;
-            }
-            foreach (Circle cannonball in cannonballs)
-            {
-                cannonball.Position += cannonball.Velocity * elapsedTime;
-            }
+            Weapon.Update(gameTime);
 
             animator.Update(gameTime);
             if (tookDamage)
@@ -361,14 +226,7 @@ namespace RBGNature.Actor
             //spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureHPBar, collision.Position - new Vector2(0, 50), getHealthSpriteRect(), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
 
-            foreach (Circle bullet in bullets)
-            {
-                spriteBatch.Draw(textureBullet, bullet.Position, RectBulletDefault, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
-            }
-            foreach (Circle cannonball in cannonballs)
-            {
-                spriteBatch.Draw(textureCannonball, cannonball.Position, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
-            }
+            Weapon.Draw(gameTime, spriteBatch);
         }
 
         private void TakeDamage(CollisionIdentity identity)
@@ -402,30 +260,8 @@ namespace RBGNature.Actor
         {
             if (groupType == PhysicsGroupType.Physical)
             {
-                for (int i = bullets.Count - 1; i >= 0; i--)
-                {
-                    Circle bullet = bullets[i];
-                    CollisionResult bulletCollision = other.Collide(s, groupType, bullet, bulletIdentity);
-                    if (bulletCollision)
-                    {
-                        bulletsToRemove.Add(bullet);
-                        bullet.Position = bulletCollision.PositionA;
-                        //bullet.Velocity = bulletCollision.VelocityA;
-                    }
+                Weapon.Collide(s, groupType, other);
 
-                }
-                for (int i = cannonballs.Count - 1; i >= 0; i--)
-                {
-                    Circle cannonball = cannonballs[i];
-                    CollisionResult cannonballCollision = other.Collide(s, groupType, cannonball, cannonballIdentity);
-                    if (cannonballCollision)
-                    {
-                        cannonballsToRemove.Add(cannonball);
-                        cannonball.Position = cannonballCollision.PositionA;
-                        //cannonball.Velocity = cannonballCollision.VelocityA;
-                    }
-
-                }
                 CollisionResult playerCollision = other.Collide(s, groupType, this.collision, null);
                 if (playerCollision)
                 {
@@ -449,32 +285,7 @@ namespace RBGNature.Actor
             CollisionResult response = CollisionResult.None;
             if (groupType == PhysicsGroupType.Physical)
             {
-                for (int i = bullets.Count - 1; i >= 0; i--)
-                {
-                    Circle bullet = bullets[i];
-                    CollisionResult bulletCollision = physicsObject.Collide(s, bullet);
-                    if (bulletCollision)
-                    {
-                        bulletsToRemove.Add(bullet);
-                        bullet.Position = bulletCollision.PositionB;
-                        //bullet.Velocity = bulletCollision.VelocityB;
-                        bulletCollision.Identity = bulletIdentity;
-                        response = bulletCollision;
-                    }
-                }
-                for (int i = cannonballs.Count - 1; i >= 0; i--)
-                {
-                    Circle cannonball = cannonballs[i];
-                    CollisionResult cannonballCollision = physicsObject.Collide(s, cannonball);
-                    if (cannonballCollision)
-                    {
-                        cannonballsToRemove.Add(cannonball);
-                        cannonball.Position = cannonballCollision.PositionB;
-                        //cannonball.Velocity = cannonballCollision.VelocityB;
-                        cannonballCollision.Identity = cannonballIdentity;
-                        response = cannonballCollision;
-                    }
-                }
+                response = Weapon.Collide(s, groupType, physicsObject, identity);
 
                 CollisionResult playerCollision = physicsObject.Collide(s, collision);
                 if (playerCollision)

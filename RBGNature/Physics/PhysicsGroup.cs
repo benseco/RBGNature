@@ -38,6 +38,22 @@ namespace RBGNature.Physics
                 }
             }
         }
+
+        public void Collide(PhysicsGroup other, float s)
+        {
+            for (int i = 0; i < group.Count; i++)
+            {
+                for (int j = 0; j < other.group.Count; j++)
+                {
+                    group[i].Collide(s, groupType, other[j]);
+                }
+            }
+        }
+
+        public ICollide this[int i]
+        {
+            get { return group[i]; }
+        }
     }
 
     public enum PhysicsGroupType
