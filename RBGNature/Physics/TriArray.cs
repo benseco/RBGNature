@@ -37,25 +37,29 @@ namespace RBGNature.Physics
 
         public override CollisionResult Collide(float s, Circle c)
         {
-            //int xIndex = (int)(c.Position.X / 20);
-            //int yIndex = (int)(c.Position.Y / 20);
-            int xMin = (int)((c.Position.X - c.Radius) / 20) - 1;
-            int xMax = (int)((c.Position.X + c.Velocity.X * s + c.Radius) / 20) + 1;
-            int yMin = (int)((c.Position.Y - c.Radius) / 20) - 1;
-            int yMax = (int)((c.Position.Y + c.Velocity.Y * s + c.Radius) / 20) + 1;
+            float xIni = c.Position.X;
+            float xFin = c.Position.X + c.Velocity.X * s;
+            float yIni = c.Position.Y;
+            float yFin = c.Position.Y + c.Velocity.Y * s;
 
-            //Console.Write("Index: " + xIndex + ", " + yIndex);
-            //Console.Write(" | XBounds: " + xMin + " - " + xMax);
-            //Console.WriteLine(" | YBounds: " + yMin + " - " + yMax);
+            float xMin = Math.Min(xIni, xFin);
+            float xMax = Math.Max(xIni, xFin);
+            float yMin = Math.Min(yIni, yFin);
+            float yMax = Math.Max(yIni, yFin);
+
+            int leftBound = (int)((xMin - c.Radius) / 20);
+            int rightBound = (int)((xMax + c.Radius) / 20);
+            int topBound = (int)((yMin - c.Radius) / 20);
+            int bottomBound = (int)((yMax + c.Radius) / 20);
 
             double time = 1;
             CollisionResult first = CollisionResult.None;
 
-            for (int i = yMin; i <= yMax; i++) //row
+            for (int i = topBound; i <= bottomBound; i++) //row
             {
                 if (i < 0 || i >= array.GetLength(0)) continue; // Index is out of bounds
 
-                for (int j = xMin; j <= xMax; j++) //column
+                for (int j = leftBound; j <= rightBound; j++) //column
                 {
                     if (j < 0 || j >= array.GetLength(1)) continue; // Index is out of bounds
                     

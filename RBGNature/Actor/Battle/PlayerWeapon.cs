@@ -34,11 +34,18 @@ namespace RBGNature.Actor.Battle
         {
             Damage = 5
         };
+        static CollisionIdentity snipeIdentity = new CollisionIdentity()
+        {
+            Damage = 10
+        };
+
+        private const float SNIPE_DECAY = 1 / 80f; 
 
         private Camera Camera;
 
         Texture2D textureBullet;
         Texture2D textureCannonball;
+        Texture2D textureSnipePoint;
 
         SoundEffect soundEffectGunshot;
         SoundEffect soundEffectRhythmClick;
@@ -48,6 +55,11 @@ namespace RBGNature.Actor.Battle
         List<Circle> bulletsToRemove;
         List<Circle> cannonballs;
         List<Circle> cannonballsToRemove;
+        List<Circle> snipes;
+        List<Circle> snipesToRemove;
+
+
+        private List<Tuple<Vector2, float>> snipePoints;
 
 
         GunMode mode;
@@ -66,63 +78,52 @@ namespace RBGNature.Actor.Battle
             bulletsToRemove = new List<Circle>();
             cannonballs = new List<Circle>();
             cannonballsToRemove = new List<Circle>();
+            snipes = new List<Circle>();
+            snipesToRemove = new List<Circle>();
+            snipePoints = new List<Tuple<Vector2, float>>();
         }
 
         public void Collide(float s, PhysicsGroupType groupType, ICollide other)
         {
-            for (int i = bullets.Count - 1; i >= 0; i--)
-            {
-                Circle bullet = bullets[i];
-                CollisionResult bulletCollision = other.Collide(s, groupType, bullet, bulletIdentity);
-                if (bulletCollision)
-                {
-                    bulletsToRemove.Add(bullet);
-                    bullet.Position = bulletCollision.PositionA;
-                    //bullet.Velocity = bulletCollision.VelocityA;
-                }
-
-            }
-            for (int i = cannonballs.Count - 1; i >= 0; i--)
-            {
-                Circle cannonball = cannonballs[i];
-                CollisionResult cannonballCollision = other.Collide(s, groupType, cannonball, cannonballIdentity);
-                if (cannonballCollision)
-                {
-                    cannonballsToRemove.Add(cannonball);
-                    cannonball.Position = cannonballCollision.PositionA;
-                    //cannonball.Velocity = cannonballCollision.VelocityA;
-                }
-
-            }
+            CollideBulletsSimple(s, other, groupType, bullets, bulletIdentity, bulletsToRemove);
+            CollideBulletsSimple(s, other, groupType, cannonballs, cannonballIdentity, cannonballsToRemove);
+            CollideBulletsSimple(s, other, groupType, snipes, snipeIdentity, snipesToRemove);
         }
 
         public CollisionResult Collide(float s, PhysicsGroupType groupType, PhysicsObject physicsObject, CollisionIdentity identity)
         {
             CollisionResult response = CollisionResult.None;
-            for (int i = bullets.Count - 1; i >= 0; i--)
+            response = CollideBulletsSimple(s, physicsObject, bullets, bulletIdentity, bulletsToRemove);
+            response = CollideBulletsSimple(s, physicsObject, cannonballs, cannonballIdentity, cannonballsToRemove);
+            response = CollideBulletsSimple(s, physicsObject, snipes, snipeIdentity, snipesToRemove);
+            return response;
+        }
+
+        private void CollideBulletsSimple(float s, ICollide other, PhysicsGroupType groupType, List<Circle> list, CollisionIdentity identity, List<Circle> removalList)
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
             {
-                Circle bullet = bullets[i];
-                CollisionResult bulletCollision = physicsObject.Collide(s, bullet);
-                if (bulletCollision)
+                Circle c = list[i];
+                CollisionResult collisionResult = other.Collide(s, groupType, c, identity);
+                if (collisionResult)
                 {
-                    bulletsToRemove.Add(bullet);
-                    bullet.Position = bulletCollision.PositionB;
-                    //bullet.Velocity = bulletCollision.VelocityB;
-                    bulletCollision.Identity = bulletIdentity;
-                    response = bulletCollision;
+                    removalList.Add(c);
                 }
             }
-            for (int i = cannonballs.Count - 1; i >= 0; i--)
+        }
+
+        private CollisionResult CollideBulletsSimple(float s, PhysicsObject physicsObject, List<Circle> list, CollisionIdentity identity, List<Circle> removalList)
+        {
+            CollisionResult response = CollisionResult.None;
+            for (int i = list.Count - 1; i >= 0; i--)
             {
-                Circle cannonball = cannonballs[i];
-                CollisionResult cannonballCollision = physicsObject.Collide(s, cannonball);
-                if (cannonballCollision)
+                Circle c = list[i];
+                CollisionResult collisionResult = physicsObject.Collide(s, c);
+                if (collisionResult)
                 {
-                    cannonballsToRemove.Add(cannonball);
-                    cannonball.Position = cannonballCollision.PositionB;
-                    //cannonball.Velocity = cannonballCollision.VelocityB;
-                    cannonballCollision.Identity = cannonballIdentity;
-                    response = cannonballCollision;
+                    removalList.Add(c);
+                    collisionResult.Identity = identity;
+                    response = collisionResult;
                 }
             }
             return response;
@@ -143,6 +144,10 @@ namespace RBGNature.Actor.Battle
             {
                 spriteBatch.Draw(textureCannonball, cannonball.Position, null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
             }
+            foreach (Tuple<Vector2, float> snipeTuple in snipePoints)
+            {
+                spriteBatch.Draw(textureSnipePoint, snipeTuple.Item1, null, Color.White * snipeTuple.Item2, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
+            }
         }
 
         public void Light(SpriteBatch spriteBatch)
@@ -154,6 +159,7 @@ namespace RBGNature.Actor.Battle
         {
             textureBullet = contentManager.Load<Texture2D>("Sprites/bullet/bullet");
             textureCannonball = contentManager.Load<Texture2D>("Sprites/bullet/cannonball");
+            textureSnipePoint = contentManager.Load<Texture2D>("Sprites/bullet/snipe");
             soundEffectGunshot = contentManager.Load<SoundEffect>("Sound/effect/gunshot");
             soundEffectRhythmClick = contentManager.Load<SoundEffect>("Sound/effect/metronome");
         }
@@ -168,15 +174,24 @@ namespace RBGNature.Actor.Battle
                 if (canChangeMode)
                 {
                     canChangeMode = false;
-                    if (mode == GunMode.Default) mode = GunMode.Cannon;
-                    else mode = GunMode.Default;
+                    switch (mode)
+                    {
+                        case GunMode.Default:
+                            mode = GunMode.Cannon;
+                            break;
+                        case GunMode.Cannon:
+                            mode = GunMode.Sniper;
+                            break;
+                        default:
+                            mode = GunMode.Default;
+                            break;
+                    }
                 }
             }
             else { canChangeMode = true; }
 
             //Remove any bullets that collided in the last update
-            bulletsToRemove.ForEach(b => bullets.Remove(b));
-            cannonballsToRemove.ForEach(b => cannonballs.Remove(b));
+            RemoveCollidedBullets();
 
             var mstate = Mouse.GetState();
             timeBetweenShots += elapsedTime;
@@ -184,26 +199,7 @@ namespace RBGNature.Actor.Battle
             {
                 if (timeBetweenShots > 100 && !justShot)
                 {
-                    if (mode == GunMode.Default)
-                    {
-                        bullets.Add(new Circle()
-                        {
-                            Position = Camera.Position,
-                            Velocity = Vector2.Normalize(mstate.Position.ToVector2() - Camera.FocalPoint) * .5f,
-                            Mass = 1,
-                            Radius = 3
-                        });
-                    }
-                    else if (mode == GunMode.Cannon)
-                    {
-                        cannonballs.Add(new Circle()
-                        {
-                            Position = Camera.Position,
-                            Velocity = Vector2.Normalize(mstate.Position.ToVector2() - Camera.FocalPoint) * .25f,
-                            Mass = 1,
-                            Radius = 6
-                        });
-                    }
+                    Shoot(mstate.Position.ToVector2());
 
                     soundEffectGunshot.CreateInstance().Play();
 
@@ -244,13 +240,89 @@ namespace RBGNature.Actor.Battle
                 rhythmReady = false;
             }
 
-            foreach (Circle bullet in bullets)
+            UpdateSnipePoints(elapsedTime);
+            MoveBullets(elapsedTime, bullets, cannonballs, snipes);
+        }
+
+        private void RemoveCollidedBullets()
+        {
+            bulletsToRemove.ForEach(b => bullets.Remove(b));
+            cannonballsToRemove.ForEach(b => cannonballs.Remove(b));
+            snipesToRemove.ForEach(b => snipes.Remove(b));
+        }
+
+        private void UpdateSnipePoints(float elapsedTime)
+        {
+            ///TODO: Performance - no need to make all these tuples!
+
+            // First lower the opacity of the existing points
+            for (int i = snipePoints.Count - 1; i >= 0; i--)
             {
-                bullet.Position += bullet.Velocity * elapsedTime;
+                Tuple<Vector2, float> snipePoint = snipePoints[i];
+                snipePoints[i] = new Tuple<Vector2, float>(snipePoint.Item1, snipePoint.Item2 - SNIPE_DECAY);
             }
-            foreach (Circle cannonball in cannonballs)
+            
+            // Remove any points which are no longer visible
+            for (int i = snipePoints.Count - 1; i >= 0; i--)
             {
-                cannonball.Position += cannonball.Velocity * elapsedTime;
+                Tuple<Vector2, float> snipePoint = snipePoints[i];
+                if (snipePoint.Item2 <= 0)
+                    snipePoints.RemoveAt(i);
+            }
+
+            // Lastly, add new points for the current position of any snipe bullets
+            foreach (Circle snipe in snipes)
+            {
+                Vector2 totalVel = snipe.Velocity * elapsedTime;
+                for (int i = 1; i <= 4; i++)
+                {
+                    snipePoints.Add(new Tuple<Vector2, float>(snipe.Position + totalVel * i / 4f, 1));
+                }
+            }
+        }
+
+        private void MoveBullets(float elapsedTime, params List<Circle>[] lists)
+        {
+            foreach (List<Circle> list in lists)
+            {
+                foreach (Circle c in list)
+                {
+                    c.Position += c.Velocity * elapsedTime;
+                }
+            }
+        }
+
+        private void Shoot(Vector2 target)
+        {
+            switch (mode)
+            {
+                case GunMode.Default:
+                    bullets.Add(new Circle()
+                    {
+                        Position = Camera.Position,
+                        Velocity = Vector2.Normalize(target - Camera.FocalPoint) * .5f,
+                        Mass = 1,
+                        Radius = 3
+                    });
+                    break;
+                case GunMode.Cannon:
+                    cannonballs.Add(new Circle()
+                    {
+                        Position = Camera.Position,
+                        Velocity = Vector2.Normalize(target - Camera.FocalPoint) * .25f,
+                        Mass = 1,
+                        Radius = 6
+                    });
+                    break;
+                case GunMode.Sniper:
+                    snipes.Add(new Circle()
+                    {
+                        Position = Camera.Position,
+                        Velocity = Vector2.Normalize(target - Camera.FocalPoint) * 2f,
+                        Mass = 1,
+                        Radius = 1
+                    });
+                    break;
             }
         }
     }

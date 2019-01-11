@@ -140,7 +140,7 @@ namespace RBGNature.Actor.Scene
             {
                 color = Color.Lerp(Color.Chocolate, Color.MidnightBlue, (timeOfDay - .875f) / .125f);
             }
-            Atmosphere = color;
+            //Atmosphere = color;
         }
     }
 }
