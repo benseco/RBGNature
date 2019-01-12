@@ -36,10 +36,10 @@ namespace RBGNature.Actor.Battle
         };
         static CollisionIdentity snipeIdentity = new CollisionIdentity()
         {
-            Damage = 10
+            Damage = 7
         };
 
-        private const float SNIPE_DECAY = 1 / 80f; 
+        private const float SNIPE_DECAY = 1 / 30f; 
 
         private Camera Camera;
 
@@ -310,7 +310,7 @@ namespace RBGNature.Actor.Battle
                     {
                         Position = Camera.Position,
                         Velocity = Vector2.Normalize(target - Camera.FocalPoint) * .25f,
-                        Mass = 1,
+                        Mass = 10,
                         Radius = 6
                     });
                     break;
@@ -319,7 +319,7 @@ namespace RBGNature.Actor.Battle
                     {
                         Position = Camera.Position,
                         Velocity = Vector2.Normalize(target - Camera.FocalPoint) * 2f,
-                        Mass = 1,
+                        Mass = 5,
                         Radius = 1
                     });
                     break;

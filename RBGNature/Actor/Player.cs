@@ -41,6 +41,7 @@ namespace RBGNature.Actor
         private CollisionResult collisionResult;
 
         public PlayerWeapon Weapon { get; set; }
+        public PlayerShield Shield { get; set; }
 
         static Player()
         {
@@ -76,6 +77,7 @@ namespace RBGNature.Actor
             CurrentHealth = MaxHealth;
             animator = new Animator(animDict_Idle[FourDirectionAnimation.Front]);
             Weapon = new PlayerWeapon(camera);
+            Shield = new PlayerShield(collision);
         }
 
         public void LoadContent(ContentManager contentManager)
@@ -92,6 +94,7 @@ namespace RBGNature.Actor
             textureLight = contentManager.Load<Texture2D>("Sprites/light/53");
 
             Weapon.LoadContent(contentManager);
+            Shield.LoadContent(contentManager);
         }
 
         /// <summary>
@@ -200,6 +203,7 @@ namespace RBGNature.Actor
             camera.MoveTo(collision.Position);
 
             Weapon.Update(gameTime);
+            Shield.Update(gameTime);
 
             animator.Update(gameTime);
             if (tookDamage)
@@ -220,13 +224,14 @@ namespace RBGNature.Actor
             {
                 tint = Color.Red;
             }
-            spriteBatch.Draw(animator.Texture, camera.Position - new Vector2(10,30), animator.NextFrame(), tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
+            spriteBatch.Draw(animator.Texture, camera.Position - new Vector2(8,30), animator.NextFrame(), tint, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, this.LayerDepth(collision.Position.Y));
 
             spriteBatch.Draw(textureCircle10, camera.Position - new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             //spriteBatch.Draw(textureCircle200, new Vector2(100,100), null, Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             spriteBatch.Draw(textureHPBar, collision.Position - new Vector2(0, 50), getHealthSpriteRect(), Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
 
             Weapon.Draw(gameTime, spriteBatch);
+            Shield.Draw(gameTime, spriteBatch);
         }
 
         private void TakeDamage(CollisionIdentity identity)
@@ -235,9 +240,16 @@ namespace RBGNature.Actor
                 return;
             if (identity.Damage > 0)
             {
-                CurrentHealth -= identity.Damage;
-                tookDamage = true;
-                timeBetweenDamage = 0;
+                if (Shield.Shielded)
+                {
+                    Shield.AlertHit();
+                }
+                else
+                {
+                    CurrentHealth -= identity.Damage;
+                    tookDamage = true;
+                    timeBetweenDamage = 0;
+                }
             }
         }
 

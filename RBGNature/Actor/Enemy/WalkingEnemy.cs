@@ -32,7 +32,7 @@ namespace RBGNature.Actor.Enemy
         Player player;
         List<Circle> bullets;
         public int CurrentHealth { get; private set; }
-        const int MaxHealth = 15;
+        const int MaxHealth = 100;
         bool tookDamage = false;
         Random random;
         Animator animator;
@@ -211,7 +211,7 @@ namespace RBGNature.Actor.Enemy
                 //collision.Velocity = .5f * (new Vector2(random.Next(-1, 2), random.Next(-1, 2)) * 0.05f + collision.Velocity * 0.92f + Vector2.Normalize((player.collision.Position - collision.Position)) * 0.03f);
 
                 //collision.Velocity = speed * Vector2.Normalize(player.collision.Position - collision.Position);
-                /*
+                
                 if (collision.Velocity == Vector2.Zero)
                 {
                     collision.Velocity = speed * Vector2.Normalize(player.collision.Position - collision.Position);
@@ -220,7 +220,7 @@ namespace RBGNature.Actor.Enemy
                 {
                     collision.Velocity = speed * (Vector2.Normalize(collision.Velocity) * 0.92f + Vector2.Normalize(player.collision.Position - collision.Position) * .08f);
                 }
-                */
+                
             }
 
             bool left = false;
@@ -240,8 +240,8 @@ namespace RBGNature.Actor.Enemy
             }
 
             float bulletSpeed = .01f;
-            //timeBetweenShots += elapsedTime;
-            if (timeBetweenShots > 1000)
+            timeBetweenShots += elapsedTime;
+            if (timeBetweenShots > 500)
             {
                 timeBetweenShots = 0;
                 Vector2 bulletOrigin = this.collision.Position + headOffset + (left ? new Vector2(-4,0) : new Vector2(4,0));
