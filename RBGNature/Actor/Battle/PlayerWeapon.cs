@@ -192,6 +192,8 @@ namespace RBGNature.Actor.Battle
 
             //Remove any bullets that collided in the last update
             RemoveCollidedBullets();
+            UpdateSnipePoints(elapsedTime);
+            MoveBullets(elapsedTime, bullets, cannonballs, snipes);
 
             var mstate = Mouse.GetState();
             timeBetweenShots += elapsedTime;
@@ -201,7 +203,7 @@ namespace RBGNature.Actor.Battle
                 {
                     Shoot(mstate.Position.ToVector2());
 
-                    soundEffectGunshot.CreateInstance().Play();
+                    //soundEffectGunshot.CreateInstance().Play();
 
                     if (countingRhythm)
                     {
@@ -240,8 +242,6 @@ namespace RBGNature.Actor.Battle
                 rhythmReady = false;
             }
 
-            UpdateSnipePoints(elapsedTime);
-            MoveBullets(elapsedTime, bullets, cannonballs, snipes);
         }
 
         private void RemoveCollidedBullets()
